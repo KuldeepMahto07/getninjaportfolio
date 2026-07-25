@@ -29,6 +29,21 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+<!-- Anti-FOUC: flag the doc for animation BEFORE first paint so hidden states apply
+     only when motion is allowed. If reduced-motion is on, nothing gets hidden. -->
+<script>
+  (function () {
+    var d = document.documentElement;
+    d.classList.add("js");
+    try {
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        d.classList.add("anim");
+      }
+    } catch (e) {}
+  })();
+</script>
+
 <style>
   :root {
     --bg: #0a0a0a;
@@ -44,12 +59,13 @@
     --maxw: 1320px;
     --pad: clamp(20px, 5vw, 72px);
     --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --swap: cubic-bezier(0.76, 0, 0.24, 1);
     --dur: 0.6s;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  html { -webkit-text-size-adjust: 100%; }
 
   body {
     background: var(--bg);
@@ -67,6 +83,12 @@
   ::selection { background: var(--accent); color: #0a0a0a; }
 
   .wrap { max-width: var(--maxw); margin: 0 auto; padding-left: var(--pad); padding-right: var(--pad); }
+
+  /* ---- Lenis recommended base styles ---- */
+  html.lenis, html.lenis body { height: auto; }
+  .lenis.lenis-smooth { scroll-behavior: auto !important; }
+  .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+  .lenis.lenis-stopped { overflow: hidden; }
 
   .eyebrow {
     font-size: 12px;
@@ -98,15 +120,19 @@
   .logo .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); display: inline-block; }
 
   .nav-links { display: flex; align-items: center; gap: 30px; }
-  .nav-links a { font-size: 14px; color: var(--muted); transition: color 0.25s var(--ease); position: relative; }
-  .nav-links a::after {
-    content: ""; position: absolute; left: 0; bottom: -4px; height: 1px; width: 0; background: var(--fg);
-    transition: width 0.3s var(--ease);
+  /* Two stacked text layers, swapped on hover with a sharp custom ease */
+  .nav-link { position: relative; font-size: 14px; color: var(--muted); line-height: 1.25; }
+  .nav-link .nl-clip { position: relative; display: block; overflow: hidden; }
+  .nav-link .nl-clip span { display: block; transition: transform 0.5s var(--swap); }
+  .nav-link .nl-b { position: absolute; top: 0; left: 0; color: var(--fg); transform: translateY(105%); }
+  .nav-link:hover .nl-a { transform: translateY(-105%); }
+  .nav-link:hover .nl-b { transform: translateY(0); }
+  .nav-link::after {
+    content: ""; position: absolute; left: 0; bottom: -5px; height: 1px; width: 0; background: var(--accent);
+    transition: width 0.35s var(--ease);
   }
-  .nav-links a:hover { color: var(--fg); }
-  .nav-links a:hover::after { width: 100%; }
-  .nav-links a.active { color: var(--fg); }
-  .nav-links a.active::after { width: 100%; background: var(--accent); }
+  .nav-link.active::after { width: 100%; }
+  .nav-link.active .nl-a { color: var(--fg); }
 
   .badge {
     display: inline-flex; align-items: center; gap: 8px;
@@ -143,7 +169,10 @@
     line-height: 0.98;
     letter-spacing: -0.015em;
   }
-  .hero h1 em { font-style: italic; color: var(--accent); }
+  /* word-split reveal: each word clipped, inner slides up */
+  .hero h1 .word { display: inline-block; overflow: hidden; padding: 0 0 0.14em; margin-bottom: -0.14em; vertical-align: top; }
+  .hero h1 .w-in { display: inline-block; will-change: transform; }
+  .hero h1 .w-in.em { font-style: italic; color: var(--accent); }
   .hero-bottom {
     display: flex; justify-content: space-between; align-items: flex-end; gap: 40px;
     margin-top: 44px; flex-wrap: wrap;
@@ -154,14 +183,13 @@
     background: var(--fg); color: #0a0a0a;
     font-size: 15px; font-weight: 500;
     padding: 15px 26px; border-radius: 100px;
-    transition: transform 0.3s var(--ease), background 0.3s var(--ease);
-    white-space: nowrap;
+    transition: background 0.3s var(--ease);
+    white-space: nowrap; will-change: transform;
   }
+  .cta .cta-label { display: inline-block; }
   .cta svg { transition: transform 0.3s var(--ease); }
   .cta:hover { background: var(--accent); }
   .cta:hover svg { transform: translate(3px, -3px); }
-  .cta.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line-strong); }
-  .cta.ghost:hover { background: var(--fg); color: #0a0a0a; }
 
   /* ---------- SECTION HEADER ---------- */
   section { position: relative; }
@@ -193,18 +221,32 @@
     display: grid; grid-template-columns: 40px 1.6fr 1fr 0.5fr 40px;
     align-items: center; gap: 20px;
     padding: 32px 0; border-top: 1px solid var(--line);
-    position: relative; transition: padding 0.4s var(--ease);
+    position: relative; transition: padding 0.5s var(--ease);
   }
   .works-list .work:last-child { border-bottom: 1px solid var(--line); }
   .work .w-idx { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .work .w-name { font-family: var(--serif); font-size: clamp(28px, 4.4vw, 62px); line-height: 1; letter-spacing: -0.01em; transition: color 0.3s var(--ease), transform 0.4s var(--ease); }
+  .work .w-name { font-family: var(--serif); font-size: clamp(28px, 4.4vw, 62px); line-height: 1; letter-spacing: -0.01em; transition: color 0.35s var(--ease); }
   .work .w-name small { display: block; font-family: var(--sans); font-size: 14px; color: var(--muted); margin-top: 10px; letter-spacing: 0; }
   .work .w-cat { font-size: 14px; color: var(--muted); }
   .work .w-year { font-size: 14px; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
-  .work .w-arrow { justify-self: end; opacity: 0; transform: translate(-8px, 8px); transition: opacity 0.3s var(--ease), transform 0.3s var(--ease); color: var(--accent); }
-  .work:hover { padding-left: 12px; }
+  .work .w-arrow { justify-self: end; opacity: 0; transform: translate(-8px, 8px); transition: opacity 0.35s var(--ease), transform 0.35s var(--ease); color: var(--accent); }
+  .work:hover { padding-left: 14px; }
   .work:hover .w-name { color: var(--accent); }
   .work:hover .w-arrow { opacity: 1; transform: translate(0, 0); }
+
+  /* Floating cursor-follow thumbnail */
+  .work-thumb {
+    position: fixed; top: 0; left: 0; z-index: 60; pointer-events: none;
+    width: 320px; height: 210px; border-radius: 14px; overflow: hidden;
+    opacity: 0; display: none;
+    box-shadow: 0 24px 70px rgba(0,0,0,0.55);
+    border: 1px solid var(--line-strong);
+    will-change: transform, opacity;
+  }
+  .work-thumb .wt-bg { position: absolute; inset: 0; }
+  .work-thumb .wt-cap { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; padding: 16px; }
+  .work-thumb .wt-cap b { font-family: var(--serif); font-weight: 400; font-size: 40px; color: #0a0a0a; line-height: 1; }
+  .work-thumb .wt-cap small { font-family: var(--sans); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(10,10,10,0.72); }
 
   /* ---------- SKILLS MARQUEE ---------- */
   .skills { padding-bottom: 40px; }
@@ -212,15 +254,18 @@
   .marquee-group:last-child { border-bottom: 1px solid var(--line); }
   .marquee-label { font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
   .marquee { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
-  .marquee-track { display: flex; gap: 0; width: max-content; will-change: transform; animation: marquee var(--speed, 40s) linear infinite; }
-  .marquee.reverse .marquee-track { animation-direction: reverse; }
-  .marquee:hover .marquee-track { animation-play-state: paused; }
+  .marquee-track { display: flex; gap: 0; width: max-content; will-change: transform; }
   .marquee-track .item {
     font-family: var(--serif); font-size: clamp(24px, 3.4vw, 46px); color: var(--fg);
     padding: 0 34px; display: inline-flex; align-items: center; gap: 34px; white-space: nowrap;
   }
   .marquee-track .item::after { content: "✦"; font-family: var(--sans); font-size: 12px; color: var(--muted-2); }
-  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* Fallback ONLY if GSAP fails to load: keep the marquee moving via CSS */
+  html.no-gsap .marquee-track { animation: marqueeFallback var(--speed, 40s) linear infinite; }
+  html.no-gsap .marquee.reverse .marquee-track { animation-direction: reverse; }
+  html.no-gsap .marquee:hover .marquee-track { animation-play-state: paused; }
+  @keyframes marqueeFallback { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
   /* ---------- ABOUT ---------- */
   .about-grid { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: clamp(30px, 5vw, 80px); align-items: start; padding-top: 20px; }
@@ -255,12 +300,10 @@
   .clock .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
   .clock b { color: var(--fg); font-weight: 500; }
 
-  /* ---------- SCROLL REVEAL ---------- */
-  .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
-  .reveal.in { opacity: 1; transform: none; }
-  .reveal[data-delay="1"] { transition-delay: 0.08s; }
-  .reveal[data-delay="2"] { transition-delay: 0.16s; }
-  .reveal[data-delay="3"] { transition-delay: 0.24s; }
+  /* ---------- SCROLL REVEAL (only hidden when animation is active) ---------- */
+  html.anim .reveal { opacity: 0; transform: translateY(30px); will-change: transform, opacity; }
+  html.anim [data-hero] { opacity: 0; }
+  html.anim [data-hero-title] { opacity: 0; }
 
   /* ---------- RESPONSIVE ---------- */
   @media (max-width: 900px) {
@@ -295,11 +338,13 @@
     .work .w-name { font-size: 32px; }
   }
 
+  /* ---------- REDUCED MOTION: everything instant, nothing hidden ---------- */
   @media (prefers-reduced-motion: reduce) {
-    html { scroll-behavior: auto; }
     *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
-    .reveal { opacity: 1 !important; transform: none !important; }
+    .reveal, [data-hero], [data-hero-title] { opacity: 1 !important; transform: none !important; }
+    .hero h1 .w-in { transform: none !important; }
     .marquee-track { animation: none !important; transform: none !important; }
+    .work-thumb { display: none !important; }
     .badge .pulse::after { display: none; }
   }
 </style>
@@ -311,10 +356,10 @@
   <div class="wrap nav-inner">
     <a href="#top" class="logo"><span class="dot"></span><b>Rohit&nbsp;Sharma</b></a>
     <nav class="nav-links">
-      <a href="#services">Services</a>
-      <a href="#works">Works</a>
-      <a href="#about">About</a>
-      <a href="#contact">Contact</a>
+      <a href="#services" class="nav-link"><span class="nl-clip"><span class="nl-a">Services</span><span class="nl-b" aria-hidden="true">Services</span></span></a>
+      <a href="#works" class="nav-link"><span class="nl-clip"><span class="nl-a">Works</span><span class="nl-b" aria-hidden="true">Works</span></span></a>
+      <a href="#about" class="nav-link"><span class="nl-clip"><span class="nl-a">About</span><span class="nl-b" aria-hidden="true">About</span></span></a>
+      <a href="#contact" class="nav-link"><span class="nl-clip"><span class="nl-a">Contact</span><span class="nl-b" aria-hidden="true">Contact</span></span></a>
     </nav>
     <span class="badge desk"><span class="pulse"></span>Available for work — Bangalore, India</span>
     <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false">
@@ -334,15 +379,15 @@
 <!-- ============ HERO ============ -->
 <section class="hero" id="top">
   <div class="wrap">
-    <div class="hero-top reveal">
+    <div class="hero-top" data-hero>
       <span class="role">Generative AI Developer</span>
       <span class="loc">Bangalore, India<br>Est. 2020</span>
     </div>
-    <h1 class="reveal" data-delay="1">I build fast, agentic <em>AI systems</em> — for AWS, NLP, and Generative AI.</h1>
+    <h1 data-hero-title>I build fast, agentic <em>AI systems</em> — for AWS, NLP, and Generative AI.</h1>
     <div class="hero-bottom">
-      <p class="hero-sub reveal" data-delay="2">5 years of experience building end-to-end ML workflows, from data preprocessing to production deployment, with strong MLOps practices and agentic AI expertise.</p>
-      <a class="cta reveal" data-delay="3" href="mailto:edgerallen27@gmail.com?subject=Project%20Inquiry">
-        Let's work together
+      <p class="hero-sub" data-hero>5 years of experience building end-to-end ML workflows, from data preprocessing to production deployment, with strong MLOps practices and agentic AI expertise.</p>
+      <a class="cta magnetic" data-hero href="mailto:edgerallen27@gmail.com?subject=Project%20Inquiry">
+        <span class="cta-label">Let's work together</span>
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
     </div>
@@ -403,8 +448,10 @@
       <span class="num">(Projects)</span>
       <h2>Selected <span>Works</span></h2>
     </div>
-    <div class="works-list">
-      <a class="work reveal" href="#contact" aria-label="Yummi project">
+    <div class="works-list" id="worksList">
+      <a class="work reveal" href="#contact" aria-label="Yummi project"
+         data-work data-title="Yummi" data-tag="Food-tech wellness"
+         data-grad="linear-gradient(135deg,#d8ff3e 0%,#8fd11c 55%,#5ea30a 100%)">
         <span class="w-idx">01</span>
         <span class="w-name">Yummi<small>React Native · Go · PostgreSQL · Docker · AWS EC2</small></span>
         <span class="w-cat">Food-tech wellness app</span>
@@ -413,7 +460,9 @@
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M6 18L18 6M18 6H8M18 6V16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </span>
       </a>
-      <a class="work reveal" href="#contact" aria-label="Deblo project">
+      <a class="work reveal" href="#contact" aria-label="Deblo project"
+         data-work data-title="Deblo" data-tag="AI healthcare assistant"
+         data-grad="linear-gradient(135deg,#7ce0d3 0%,#41b3d3 55%,#2f7fb0 100%)">
         <span class="w-idx">02</span>
         <span class="w-name">Deblo<small>Next.js · PostgreSQL · Gemini 2.5 · Drizzle ORM</small></span>
         <span class="w-cat">AI healthcare assistant</span>
@@ -426,6 +475,12 @@
   </div>
 </section>
 
+<!-- Floating project thumbnail (cursor-follow) -->
+<div class="work-thumb" id="workThumb" aria-hidden="true">
+  <div class="wt-bg"></div>
+  <div class="wt-cap"><b></b><small></small></div>
+</div>
+
 <!-- ============ SKILLS ============ -->
 <section class="skills" id="skills">
   <div class="wrap">
@@ -437,8 +492,8 @@
 
   <div class="marquee-group">
     <div class="wrap"><div class="marquee-label">Languages &amp; Tools</div></div>
-    <div class="marquee" data-marquee>
-      <div class="marquee-track" style="--speed:38s">
+    <div class="marquee" data-marquee data-dir="left" data-speed="55">
+      <div class="marquee-track">
         <span class="item">Python</span><span class="item">SQL</span><span class="item">MySQL</span><span class="item">MongoDB</span><span class="item">Git</span><span class="item">Docker</span><span class="item">Postman</span>
         <span class="item">Python</span><span class="item">SQL</span><span class="item">MySQL</span><span class="item">MongoDB</span><span class="item">Git</span><span class="item">Docker</span><span class="item">Postman</span>
       </div>
@@ -447,8 +502,8 @@
 
   <div class="marquee-group">
     <div class="wrap"><div class="marquee-label">Frameworks &amp; Libraries</div></div>
-    <div class="marquee reverse" data-marquee>
-      <div class="marquee-track" style="--speed:44s">
+    <div class="marquee reverse" data-marquee data-dir="right" data-speed="48">
+      <div class="marquee-track">
         <span class="item">LangChain</span><span class="item">LangGraph</span><span class="item">CrewAI</span><span class="item">PyTorch</span><span class="item">FastAPI</span><span class="item">Hugging Face Transformers</span>
         <span class="item">LangChain</span><span class="item">LangGraph</span><span class="item">CrewAI</span><span class="item">PyTorch</span><span class="item">FastAPI</span><span class="item">Hugging Face Transformers</span>
       </div>
@@ -457,8 +512,8 @@
 
   <div class="marquee-group">
     <div class="wrap"><div class="marquee-label">AWS / Core</div></div>
-    <div class="marquee" data-marquee>
-      <div class="marquee-track" style="--speed:40s">
+    <div class="marquee" data-marquee data-dir="left" data-speed="52">
+      <div class="marquee-track">
         <span class="item">Bedrock Agents</span><span class="item">S3</span><span class="item">Lambda</span><span class="item">OpenSearch</span><span class="item">RDS</span><span class="item">IAM</span><span class="item">MLOps</span><span class="item">Agile</span>
         <span class="item">Bedrock Agents</span><span class="item">S3</span><span class="item">Lambda</span><span class="item">OpenSearch</span><span class="item">RDS</span><span class="item">IAM</span><span class="item">MLOps</span><span class="item">Agile</span>
       </div>
@@ -479,7 +534,7 @@
       </div>
       <div>
         <p class="about-lead reveal">I'm a Generative AI Developer turning research-grade models into <em>reliable, shipping products.</em></p>
-        <div class="about-body reveal" data-delay="1">
+        <div class="about-body reveal">
           <p>Generative AI Developer with 5 years across AWS, NLP, and applied ML. Currently building client-servicing AI assistance for Barclays via Capgemini, after 3 years at Infosys shipping computer vision pipelines and fine-tuned LLMs.</p>
           <p>AWS Certified Cloud Practitioner and AI Practitioner. M.Sc. Applied Mathematics, Central University of Jharkhand.</p>
           <div class="about-meta">
@@ -497,10 +552,10 @@
 <section class="contact" id="contact">
   <div class="wrap">
     <div class="eyebrow reveal">(Let's talk)</div>
-    <h2 class="reveal" data-delay="1">Let's Make It <em>Happen</em></h2>
-    <p class="sub reveal" data-delay="2">Have an AI system in mind? Let's turn it into something that ships and scales.</p>
-    <a class="cta reveal" data-delay="3" href="mailto:edgerallen27@gmail.com?subject=Project%20Quote%20Request">
-      Get a quote
+    <h2 class="reveal">Let's Make It <em>Happen</em></h2>
+    <p class="sub reveal">Have an AI system in mind? Let's turn it into something that ships and scales.</p>
+    <a class="cta magnetic reveal" href="mailto:edgerallen27@gmail.com?subject=Project%20Quote%20Request">
+      <span class="cta-label">Get a quote</span>
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5M12 4V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </a>
   </div>
@@ -540,9 +595,22 @@
   </div>
 </footer>
 
+<!-- ===== Animation libraries: GSAP core + ScrollTrigger + Lenis ===== -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+
 <script>
 (function () {
+  "use strict";
+  var docEl = document.documentElement;
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var hasGSAP = !!(window.gsap && window.ScrollTrigger);
+  var canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+  /* ============================================================
+     ALWAYS-ON UTILITIES (work with or without GSAP)
+     ============================================================ */
 
   /* ---- Nav scrolled state ---- */
   var nav = document.getElementById("nav");
@@ -568,25 +636,7 @@
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
     document.body.style.overflow = open ? "hidden" : "";
   });
-  menu.querySelectorAll("a").forEach(function (a) {
-    a.addEventListener("click", closeMenu);
-  });
-
-  /* ---- Scroll reveal ---- */
-  var reveals = document.querySelectorAll(".reveal");
-  if (reduceMotion || !("IntersectionObserver" in window)) {
-    reveals.forEach(function (el) { el.classList.add("in"); });
-  } else {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (e.isIntersecting) {
-          e.target.classList.add("in");
-          io.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
-    reveals.forEach(function (el) { io.observe(el); });
-  }
+  menu.querySelectorAll("a").forEach(function (a) { a.addEventListener("click", closeMenu); });
 
   /* ---- Live local time (Bangalore / IST) ---- */
   var clockEl = document.getElementById("clock");
@@ -597,9 +647,7 @@
         hour12: false, timeZone: "Asia/Kolkata"
       }).format(new Date());
       clockEl.textContent = t + " IST";
-    } catch (err) {
-      clockEl.textContent = new Date().toLocaleTimeString();
-    }
+    } catch (err) { clockEl.textContent = new Date().toLocaleTimeString(); }
   }
   tick();
   setInterval(tick, 1000);
@@ -607,14 +655,10 @@
   /* ---- Active-section nav highlighting (scrollspy) ---- */
   var navLinks = Array.prototype.slice.call(document.querySelectorAll(".nav-links a"));
   var linkFor = {};
-  navLinks.forEach(function (a) {
-    var id = a.getAttribute("href").replace("#", "");
-    linkFor[id] = a;
-  });
+  navLinks.forEach(function (a) { linkFor[a.getAttribute("href").replace("#", "")] = a; });
   var spySections = ["services", "works", "about", "contact"]
     .map(function (id) { return document.getElementById(id); })
     .filter(Boolean);
-
   if ("IntersectionObserver" in window && spySections.length) {
     var spy = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
@@ -630,6 +674,216 @@
 
   /* ---- Year ---- */
   document.getElementById("year").textContent = new Date().getFullYear();
+
+  /* ============================================================
+     GRACEFUL FALLBACK — no GSAP (CDN blocked) or reduced motion
+     ============================================================ */
+  if (!hasGSAP) {
+    // Reveal everything; let CSS keyframe fallback drive the marquee.
+    docEl.classList.remove("anim");
+    docEl.classList.add("no-gsap");
+    // provide --speed for the fallback keyframes
+    document.querySelectorAll("[data-marquee]").forEach(function (m) {
+      var s = parseFloat(m.getAttribute("data-speed")) || 50;
+      m.querySelector(".marquee-track").style.setProperty("--speed", (2400 / s) + "s");
+    });
+    return;
+  }
+
+  var gsap = window.gsap;
+  gsap.registerPlugin(window.ScrollTrigger);
+
+  if (reduceMotion) {
+    // GSAP present but user prefers no motion: no Lenis, no animations,
+    // everything already visible (CSS media query handles it). Done.
+    return;
+  }
+
+  /* ============================================================
+     LENIS — inertial smooth scroll, driven by the GSAP ticker
+     ============================================================ */
+  var lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 1, smoothWheel: true });
+  lenis.on("scroll", window.ScrollTrigger.update);
+  gsap.ticker.add(function (time) { lenis.raf(time * 1000); });
+  gsap.ticker.lagSmoothing(0);
+
+  /* ---- Anchor links routed through Lenis ---- */
+  document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+    a.addEventListener("click", function (e) {
+      var id = a.getAttribute("href");
+      if (id === "#") return;
+      var target = document.querySelector(id);
+      if (!target) return;
+      e.preventDefault();
+      closeMenu();
+      lenis.scrollTo(target, { offset: -70, duration: 1.15 });
+    });
+  });
+
+  /* ============================================================
+     HERO — split headline into words + load-in sequence
+     ============================================================ */
+  var title = document.querySelector("[data-hero-title]");
+  function splitWords(el) {
+    var words = [];
+    var nodes = Array.prototype.slice.call(el.childNodes);
+    el.innerHTML = "";
+    nodes.forEach(function (node) {
+      var isEm = node.nodeType === 1 && node.tagName.toLowerCase() === "em";
+      var text = node.textContent;
+      text.split(/(\s+)/).forEach(function (chunk) {
+        if (chunk === "") return;
+        if (/^\s+$/.test(chunk)) { el.appendChild(document.createTextNode(" ")); return; }
+        var word = document.createElement("span");
+        word.className = "word";
+        var inner = document.createElement("span");
+        inner.className = "w-in" + (isEm ? " em" : "");
+        inner.textContent = chunk;
+        word.appendChild(inner);
+        el.appendChild(word);
+        words.push(inner);
+      });
+    });
+    return words;
+  }
+  var titleWords = splitWords(title);
+
+  // set initial hidden states
+  gsap.set(title, { opacity: 1 });
+  gsap.set(titleWords, { yPercent: 110 });
+  gsap.set("[data-hero]", { opacity: 0, y: 28 });
+
+  var intro = gsap.timeline({ defaults: { ease: "expo.out" } });
+  intro
+    .to(".hero-top", { opacity: 1, y: 0, duration: 0.7 }, 0.0)
+    .to(titleWords, { yPercent: 0, duration: 0.9, stagger: 0.04, ease: "power3.out" }, 0.08)
+    .to(".hero-sub", { opacity: 1, y: 0, duration: 0.7 }, 0.34)
+    .to(".hero .cta", { opacity: 1, y: 0, duration: 0.7 }, 0.46);
+
+  /* ============================================================
+     SCROLL REVEALS — ScrollTrigger.batch, staggered
+     ============================================================ */
+  gsap.set(".reveal", { opacity: 0, y: 30 });
+  window.ScrollTrigger.batch(".reveal", {
+    start: "top 85%",
+    onEnter: function (batch) {
+      gsap.to(batch, {
+        opacity: 1, y: 0, duration: 0.9, ease: "power3.out",
+        stagger: 0.08, overwrite: true
+      });
+    }
+  });
+
+  /* ============================================================
+     MAGNETIC BUTTONS — shift toward cursor, spring back
+     ============================================================ */
+  if (canHover) {
+    document.querySelectorAll(".magnetic").forEach(function (btn) {
+      var xTo = gsap.quickTo(btn, "x", { duration: 0.5, ease: "power3.out" });
+      var yTo = gsap.quickTo(btn, "y", { duration: 0.5, ease: "power3.out" });
+      btn.addEventListener("mousemove", function (e) {
+        var r = btn.getBoundingClientRect();
+        var relX = e.clientX - (r.left + r.width / 2);
+        var relY = e.clientY - (r.top + r.height / 2);
+        xTo(relX * 0.35);
+        yTo(relY * 0.5);
+      });
+      btn.addEventListener("mouseleave", function () {
+        gsap.to(btn, { x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, 0.4)" });
+      });
+    });
+  }
+
+  /* ============================================================
+     PROJECT THUMBNAIL — follows cursor with lag, soft scale-in
+     ============================================================ */
+  if (canHover) {
+    var thumb = document.getElementById("workThumb");
+    var thumbBg = thumb.querySelector(".wt-bg");
+    var thumbTitle = thumb.querySelector(".wt-cap b");
+    var thumbTag = thumb.querySelector(".wt-cap small");
+    var worksList = document.getElementById("worksList");
+
+    gsap.set(thumb, { xPercent: -50, yPercent: -50, scale: 0.9 });
+    var tx = gsap.quickTo(thumb, "x", { duration: 0.55, ease: "power3.out" });
+    var ty = gsap.quickTo(thumb, "y", { duration: 0.55, ease: "power3.out" });
+    var thumbShown = false;
+
+    worksList.addEventListener("mousemove", function (e) {
+      tx(e.clientX);
+      ty(e.clientY);
+    });
+
+    document.querySelectorAll("[data-work]").forEach(function (row) {
+      row.addEventListener("mouseenter", function (e) {
+        thumbBg.style.background = row.getAttribute("data-grad");
+        thumbTitle.textContent = row.getAttribute("data-title");
+        thumbTag.textContent = row.getAttribute("data-tag");
+        thumb.style.display = "block";
+        // jump to cursor without a trail on first appearance
+        gsap.set(thumb, { x: e.clientX, y: e.clientY });
+        thumbShown = true;
+        gsap.to(thumb, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out", overwrite: true });
+      });
+      row.addEventListener("mouseleave", function () {
+        gsap.to(thumb, {
+          opacity: 0, scale: 0.9, duration: 0.4, ease: "power2.out", overwrite: true,
+          onComplete: function () { if (!thumbShown) thumb.style.display = "none"; }
+        });
+        thumbShown = false;
+        setTimeout(function () { if (!thumbShown) thumb.style.display = "none"; }, 420);
+      });
+    });
+  }
+
+  /* ============================================================
+     MARQUEE — frame-consistent loop on the GSAP ticker,
+     eases to a smooth stop on hover (not an abrupt pause)
+     ============================================================ */
+  var marquees = Array.prototype.slice.call(document.querySelectorAll("[data-marquee]")).map(function (m) {
+    var track = m.querySelector(".marquee-track");
+    var state = {
+      el: m,
+      track: track,
+      dir: m.getAttribute("data-dir") === "right" ? 1 : -1,
+      speed: parseFloat(m.getAttribute("data-speed")) || 50,
+      half: track.scrollWidth / 2,
+      pos: 0,
+      v: 1,      // current velocity factor
+      target: 1  // desired velocity factor
+    };
+    m.addEventListener("mouseenter", function () { state.target = 0; });
+    m.addEventListener("mouseleave", function () { state.target = 1; });
+    return state;
+  });
+
+  function recalcMarquees() {
+    marquees.forEach(function (s) { s.half = s.track.scrollWidth / 2; });
+  }
+  window.addEventListener("resize", recalcMarquees);
+  window.addEventListener("load", function () { recalcMarquees(); window.ScrollTrigger.refresh(); });
+
+  var lastT = 0;
+  gsap.ticker.add(function (time) {
+    var dt = lastT ? Math.min(time - lastT, 0.05) : 0.016;
+    lastT = time;
+    for (var i = 0; i < marquees.length; i++) {
+      var s = marquees[i];
+      // ease the velocity factor toward its target (smooth start/stop)
+      s.v += (s.target - s.v) * Math.min(1, dt * 4);
+      s.pos += s.speed * dt * s.v;
+      if (s.half > 0) {
+        var m = s.pos % s.half;
+        var txv = s.dir === 1 ? (m - s.half) : -m;
+        s.track.style.transform = "translate3d(" + txv + "px,0,0)";
+      }
+    }
+  });
+
+  // Fonts can change word widths; refresh once they're ready.
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function () { recalcMarquees(); window.ScrollTrigger.refresh(); });
+  }
 })();
 </script>
 </body>
