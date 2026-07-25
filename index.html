@@ -4,7 +4,28 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Rohit Sharma — Generative AI Developer</title>
-<meta name="description" content="Rohit Sharma — Generative AI Developer building fast, agentic AI systems for AWS, NLP, and Generative AI." />
+<meta name="description" content="Rohit Sharma — Generative AI Developer building fast, agentic AI systems for AWS, NLP, and Generative AI. 5 years across AWS, NLP, and applied ML." />
+<meta name="author" content="Rohit Sharma" />
+<meta name="keywords" content="Rohit Sharma, Generative AI Developer, AWS, NLP, Machine Learning, MLOps, LangChain, Bedrock Agents, Bangalore" />
+<meta name="theme-color" content="#0a0a0a" />
+<link rel="canonical" href="https://kuldeepmahto07.github.io/getninjaportfolio/" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Rohit Sharma — Portfolio" />
+<meta property="og:title" content="Rohit Sharma — Generative AI Developer" />
+<meta property="og:description" content="I build fast, agentic AI systems — for AWS, NLP, and Generative AI." />
+<meta property="og:url" content="https://kuldeepmahto07.github.io/getninjaportfolio/" />
+<meta property="og:locale" content="en_US" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Rohit Sharma — Generative AI Developer" />
+<meta name="twitter:description" content="I build fast, agentic AI systems — for AWS, NLP, and Generative AI." />
+
+<!-- Favicon: accent dot on dark, matches the logo mark -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%230a0a0a'/%3E%3Ctext%20x='16'%20y='22'%20font-family='Georgia,serif'%20font-size='18'%20fill='%23f4f2ee'%20text-anchor='middle'%3ER%3C/text%3E%3Ccircle%20cx='24'%20cy='9'%20r='3'%20fill='%23d8ff3e'/%3E%3C/svg%3E" />
+
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -84,6 +105,8 @@
   }
   .nav-links a:hover { color: var(--fg); }
   .nav-links a:hover::after { width: 100%; }
+  .nav-links a.active { color: var(--fg); }
+  .nav-links a.active::after { width: 100%; background: var(--accent); }
 
   .badge {
     display: inline-flex; align-items: center; gap: 8px;
@@ -580,6 +603,30 @@
   }
   tick();
   setInterval(tick, 1000);
+
+  /* ---- Active-section nav highlighting (scrollspy) ---- */
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll(".nav-links a"));
+  var linkFor = {};
+  navLinks.forEach(function (a) {
+    var id = a.getAttribute("href").replace("#", "");
+    linkFor[id] = a;
+  });
+  var spySections = ["services", "works", "about", "contact"]
+    .map(function (id) { return document.getElementById(id); })
+    .filter(Boolean);
+
+  if ("IntersectionObserver" in window && spySections.length) {
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          navLinks.forEach(function (a) { a.classList.remove("active"); });
+          var link = linkFor[e.target.id];
+          if (link) link.classList.add("active");
+        }
+      });
+    }, { rootMargin: "-45% 0px -50% 0px", threshold: 0 });
+    spySections.forEach(function (s) { spy.observe(s); });
+  }
 
   /* ---- Year ---- */
   document.getElementById("year").textContent = new Date().getFullYear();
