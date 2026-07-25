@@ -1,0 +1,50 @@
+@use "../../styles/tokens" as *;
+
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  background: var(--cream);
+  pointer-events: none;
+  opacity: 0;
+  // Difference blending lets the bare dot read on both cream and near-black
+  // sections without any JS colour swapping (as the reference does).
+  mix-blend-mode: difference;
+  will-change: transform, width, height;
+  display: none;
+
+  @include fine-pointer {
+    display: block;
+  }
+
+  @include reduced {
+    display: none !important;
+  }
+}
+
+// Blending is great for the dot but ruins text contrast: on cream the disc
+// inverts to near-black, and a blended label on top comes out muddy. So the
+// labelled state opts out of blending and uses explicit ink/cream instead.
+.labelled {
+  mix-blend-mode: normal;
+  background: var(--ink);
+}
+
+.label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  @include eyebrow;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--cream);
+  opacity: 0;
+  white-space: nowrap;
+}

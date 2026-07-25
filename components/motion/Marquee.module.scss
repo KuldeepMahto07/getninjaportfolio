@@ -1,0 +1,30 @@
+@use "../../styles/tokens" as *;
+
+.marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.item {
+  @include display(30px, 6vw, 96px);
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(20px, 3vw, 44px);
+  padding-right: clamp(20px, 3vw, 44px);
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.sep {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-style: normal;
+  color: var(--accent);
+}

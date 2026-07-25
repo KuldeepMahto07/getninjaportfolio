@@ -1,0 +1,9 @@
+@use "../../styles/tokens" as *;
+
+.band {
+  background: var(--bg-invert);
+  color: var(--fg-invert);
+  padding: clamp(26px, 4vw, 52px) 0;
+  margin: clamp(50px, 8vw, 110px) 0;
+  overflow: hidden;
+}

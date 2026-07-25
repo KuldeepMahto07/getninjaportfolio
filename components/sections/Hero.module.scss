@@ -1,0 +1,111 @@
+@use "../../styles/tokens" as *;
+
+.hero {
+  position: relative;
+  padding-top: clamp(130px, 20vh, 210px);
+  padding-bottom: clamp(50px, 9vh, 110px);
+}
+
+.inner {
+  @include wrap;
+}
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 20px;
+  font-size: 13px;
+  color: var(--muted);
+  padding-bottom: 26px;
+  border-bottom: 1px solid var(--line);
+
+  span:last-child {
+    text-align: right;
+  }
+
+  @include mobile {
+    flex-direction: column;
+    gap: 6px;
+
+    span:last-child {
+      text-align: left;
+    }
+  }
+}
+
+// Oversized name, one masked line per word
+.name {
+  margin-top: clamp(18px, 3vw, 40px);
+  @include display(64px, 15.5vw, 250px);
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+.nameLine {
+  display: block;
+
+  &:last-child {
+    // Unusual positioning: second line indented, editorial rather than centred
+    padding-left: clamp(0px, 12vw, 240px);
+  }
+}
+
+.roleRow {
+  margin-top: clamp(22px, 3vw, 44px);
+}
+
+.role {
+  @include display(24px, 3.4vw, 46px);
+  max-width: 22ch;
+  line-height: 1.08;
+}
+
+.bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 44px;
+  margin-top: clamp(34px, 5vw, 70px);
+  flex-wrap: wrap;
+}
+
+.desc {
+  max-width: 46ch;
+  font-size: clamp(14px, 1.3vw, 17px);
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.ctaWrap {
+  flex: none;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--ink);
+  color: var(--cream);
+  font-size: 15px;
+  font-weight: 500;
+  padding: 16px 28px;
+  border-radius: 100px;
+  white-space: nowrap;
+  will-change: transform;
+  transition:
+    background-color 0.35s var(--e-micro),
+    color 0.35s var(--e-micro);
+
+  svg {
+    transition: transform 0.4s var(--e-swap);
+  }
+
+  &:hover {
+    background: var(--accent);
+    color: #fff;
+  }
+  &:hover svg {
+    transform: translate(3px, -3px);
+  }
+}

@@ -1,0 +1,29 @@
+@use "../../styles/tokens" as *;
+
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  padding-top: clamp(56px, 8vw, 96px);
+  border-top: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+
+.label {
+  @include eyebrow;
+  color: var(--muted);
+  flex: none;
+}
+
+.title {
+  @include display(30px, 4.6vw, 76px);
+  text-transform: uppercase;
+}
+
+.invert {
+  border-top-color: var(--line-invert);
+
+  .label {
+    color: var(--muted-invert);
+  }
+}

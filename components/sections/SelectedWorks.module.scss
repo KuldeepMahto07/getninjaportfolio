@@ -1,0 +1,23 @@
+@use "../../styles/tokens" as *;
+
+.section {
+  padding-bottom: clamp(70px, 11vw, 150px);
+}
+
+.inner {
+  @include wrap;
+}
+
+.intro {
+  margin: clamp(30px, 4vw, 56px) 0 clamp(60px, 8vw, 110px);
+  font-size: clamp(15px, 1.5vw, 20px);
+  line-height: 1.55;
+  color: var(--muted);
+  max-width: 52ch;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(90px, 14vh, 200px);
+}

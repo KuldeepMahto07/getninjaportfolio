@@ -1,0 +1,230 @@
+@use "../../styles/tokens" as *;
+
+.card {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 20px 24px;
+  position: relative;
+}
+
+// Asymmetric: image weighted left, metadata pushed to the far column.
+.media {
+  grid-column: 1 / span 8;
+  grid-row: 1;
+  position: relative;
+  display: block;
+}
+
+.side {
+  grid-column: 10 / span 3;
+  grid-row: 1;
+  align-self: end;
+  padding-bottom: 8px;
+}
+
+.head {
+  grid-column: 1 / span 9;
+  grid-row: 2;
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.view {
+  grid-row: 3;
+  grid-column: 1 / span 6;
+}
+
+// Mirrored variant
+.alt {
+  .media {
+    grid-column: 5 / span 8;
+  }
+  .side {
+    grid-column: 1 / span 3;
+    align-self: start;
+    padding-top: 10px;
+  }
+  .head {
+    grid-column: 4 / span 9;
+  }
+  .view {
+    grid-column: 4 / span 6;
+  }
+}
+
+.numWrap {
+  position: absolute;
+  z-index: 3;
+  top: clamp(-40px, -3.4vw, -20px);
+  left: -0.06em;
+  pointer-events: none;
+}
+
+.alt .numWrap {
+  left: auto;
+  right: -0.04em;
+}
+
+.num {
+  @include display(56px, 9vw, 140px);
+  line-height: 0.8;
+  display: block;
+
+  i {
+    font-style: normal;
+    color: var(--accent);
+  }
+}
+
+.frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+  aspect-ratio: 16 / 10.5;
+  border: 1px solid var(--line);
+  background: var(--cream-deep);
+}
+
+.stageWarm {
+  background: radial-gradient(120% 120% at 30% 18%, #fff4e4 0%, #f4e2c9 48%, #e9d4b6 100%);
+}
+
+.tint {
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s var(--e-micro);
+}
+
+.isHover .tint {
+  opacity: 0.06;
+}
+
+.titleClip {
+  display: block;
+  overflow: hidden;
+  padding: 0 36px 0.1em 0;
+}
+
+.titleInner {
+  display: block;
+  will-change: transform;
+}
+
+.title {
+  @include display(40px, 7.4vw, 116px);
+  text-transform: uppercase;
+  display: block;
+}
+
+.category {
+  @include eyebrow;
+  color: var(--muted);
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.metaRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  dt {
+    @include eyebrow;
+    font-size: 10px;
+    color: var(--muted-2);
+  }
+
+  dd {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+}
+
+.note {
+  margin-top: 16px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted-2);
+  max-width: 34ch;
+}
+
+.view {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  width: fit-content;
+  margin-top: 6px;
+  @include eyebrow;
+  font-size: 11px;
+  color: var(--fg);
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--line-strong);
+  transition:
+    color 0.35s var(--e-micro),
+    border-color 0.35s var(--e-micro);
+}
+
+.arrow {
+  display: inline-flex;
+  transition: transform 0.45s var(--e-swap);
+}
+
+.view:hover,
+.isHover .view {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.view:hover .arrow,
+.isHover .view .arrow {
+  transform: translate(3px, -3px);
+}
+
+// ---- Single column below the tablet breakpoint ----
+@include tablet-down {
+  .card,
+  .alt {
+    grid-template-columns: 1fr;
+    gap: 16px;
+
+    .media,
+    .side,
+    .head,
+    .view {
+      grid-column: 1 / -1;
+      grid-row: auto;
+      align-self: auto;
+      padding-top: 0;
+    }
+  }
+
+  .numWrap,
+  .alt .numWrap {
+    top: -26px;
+    left: 0;
+    right: auto;
+  }
+
+  .num {
+    font-size: 52px;
+  }
+
+  .frame {
+    aspect-ratio: 4 / 3;
+  }
+
+  .titleClip {
+    padding-right: 0;
+  }
+}
