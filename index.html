@@ -261,37 +261,113 @@
   .service .s-tools li { display: flex; gap: 14px; font-size: 15px; color: var(--muted); align-items: baseline; }
   .service .s-tools li .idx { color: var(--muted-2); font-size: 12px; font-variant-numeric: tabular-nums; flex: none; width: 22px; }
 
-  /* ---------- SELECTED WORKS ---------- */
-  .work {
-    display: grid; grid-template-columns: 40px 1.6fr 1fr 0.5fr 40px;
-    align-items: center; gap: 20px;
-    padding: 32px 0; border-top: 1px solid var(--line);
-    position: relative; transition: padding 0.5s var(--ease);
-  }
-  .works-list .work:last-child { border-bottom: 1px solid var(--line); }
-  .work .w-idx { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .work .w-name { font-family: var(--serif); font-size: clamp(28px, 4.4vw, 62px); line-height: 1; letter-spacing: -0.01em; transition: color 0.35s var(--ease); }
-  .work .w-name small { display: block; font-family: var(--sans); font-size: 14px; color: var(--muted); margin-top: 10px; letter-spacing: 0; }
-  .work .w-cat { font-size: 14px; color: var(--muted); }
-  .work .w-year { font-size: 14px; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
-  .work .w-arrow { justify-self: end; opacity: 0; transform: translate(-8px, 8px); transition: opacity 0.35s var(--ease), transform 0.35s var(--ease); color: var(--accent); }
-  .work:hover { padding-left: 14px; }
-  .work:hover .w-name { color: var(--accent); }
-  .work:hover .w-arrow { opacity: 1; transform: translate(0, 0); }
+  /* ---------- SELECTED WORKS — editorial case studies ---------- */
+  .works-list { display: flex; flex-direction: column; gap: clamp(90px, 14vh, 190px); }
 
-  /* Floating cursor-follow thumbnail */
-  .work-thumb {
-    position: fixed; top: 0; left: 0; z-index: 60; pointer-events: none;
-    width: 320px; height: 210px; border-radius: 14px; overflow: hidden;
-    opacity: 0; display: none;
-    box-shadow: 0 24px 70px rgba(0,0,0,0.55);
-    border: 1px solid var(--line-strong);
-    will-change: transform, opacity;
+  /* Asymmetric: alternating column spans + vertical offsets */
+  .case { display: grid; grid-template-columns: repeat(12, 1fr); gap: 22px 24px; position: relative; }
+  .case .c-media {
+    grid-column: 1 / span 8; grid-row: 1;
+    position: relative; display: block;
+    text-decoration: none; color: inherit;
   }
-  .work-thumb .wt-bg { position: absolute; inset: 0; }
-  .work-thumb .wt-cap { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; padding: 16px; }
-  .work-thumb .wt-cap b { font-family: var(--serif); font-weight: 400; font-size: 40px; color: #0a0a0a; line-height: 1; }
-  .work-thumb .wt-cap small { font-family: var(--sans); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(10,10,10,0.72); }
+  .case.alt .c-media { grid-column: 5 / span 8; }
+  .case .c-side { grid-row: 1; align-self: end; padding-bottom: 6px; }
+  .case .c-side { grid-column: 10 / span 3; }
+  .case.alt .c-side { grid-column: 1 / span 3; align-self: start; padding-top: 8px; }
+
+  /* Oversized index numeral, unusually placed */
+  .case .c-num {
+    position: absolute; z-index: 3; pointer-events: none;
+    font-family: var(--serif); font-weight: 400; line-height: 0.8;
+    font-size: clamp(56px, 9vw, 132px); color: var(--fg);
+    top: clamp(-34px, -3vw, -18px); left: -0.06em;
+    mix-blend-mode: normal;
+  }
+  .case.alt .c-num { left: auto; right: -0.04em; }
+  .case .c-num i { font-style: normal; color: var(--accent); }
+
+  /* Image container + mask (mask is the reveal, inner holds parallax) */
+  .c-frame {
+    position: relative; overflow: hidden; border-radius: 4px;
+    aspect-ratio: 16 / 10.5;
+    background: var(--bg-elev);
+    border: 1px solid var(--line);
+    clip-path: inset(0 0 0 0);
+  }
+  .c-frame .c-inner {
+    position: absolute; inset: -6% 0 -6% 0; /* overscan so parallax never voids edges */
+    will-change: transform;
+  }
+  .c-frame .c-img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    will-change: transform;
+  }
+  .c-frame .c-img img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+
+  /* Yummi: illustration on a warm stage rather than a fake screenshot */
+  .c-frame.stage-warm { background: radial-gradient(120% 120% at 30% 18%, #fff3e2 0%, #f6e5cf 45%, #ecd7bd 100%); }
+  .c-frame.stage-warm .c-img { display: flex; align-items: center; justify-content: center; padding: clamp(18px, 3.5vw, 54px); }
+  .c-frame.stage-warm .c-img img { width: auto; max-width: min(56%, 420px); height: auto; max-height: 88%; object-fit: contain; filter: drop-shadow(0 26px 44px rgba(80,40,10,0.22)); }
+  .c-frame.stage-warm .stage-note {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 18px;
+    display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(60,40,20,0.62);
+  }
+
+  /* Hover overlay tint */
+  .c-frame .c-tint { position: absolute; inset: 0; background: var(--fg); opacity: 0; pointer-events: none; }
+
+  /* Title block under/over the image */
+  .case .c-head { grid-column: 1 / span 9; grid-row: 2; display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap; margin-top: 22px; }
+  .case.alt .c-head { grid-column: 4 / span 9; }
+  /* Clips vertically for the reveal; extra right room so the hover x-shift isn't cut off */
+  .c-title-clip {
+    overflow: hidden; display: block;
+    padding: 0 34px 0.1em 0; margin: 0 0 -0.1em 0;
+  }
+  .c-title {
+    display: block; font-family: var(--serif); font-weight: 400;
+    font-size: clamp(38px, 7.4vw, 104px); line-height: 0.95; letter-spacing: -0.02em;
+    will-change: transform;
+  }
+  .c-cat { font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+
+  /* Tiny metadata */
+  .c-meta { display: flex; flex-direction: column; gap: 12px; }
+  .c-meta .m-row { display: flex; flex-direction: column; gap: 5px; }
+  .c-meta .m-k { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted-2); }
+  .c-meta .m-v { font-size: 13px; line-height: 1.5; color: var(--muted); }
+  .c-meta .m-v b { color: var(--fg); font-weight: 500; }
+  .c-note { font-size: 12px; line-height: 1.6; color: var(--muted); max-width: 34ch; }
+
+  /* VIEW PROJECT link */
+  .c-view {
+    grid-row: 3; grid-column: 1 / span 6; margin-top: 4px;
+    display: inline-flex; align-items: center; gap: 12px; width: fit-content;
+    font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg);
+    padding-bottom: 6px; border-bottom: 1px solid var(--line-strong);
+    transition: color 0.35s var(--ease), border-color 0.35s var(--ease);
+  }
+  .case.alt .c-view { grid-column: 4 / span 6; }
+  .c-view .v-arrow { display: inline-flex; align-items: center; transition: transform 0.45s var(--swap); }
+  .c-view .v-arrow svg { display: block; }
+  .c-view:hover { color: var(--accent); border-color: var(--accent); }
+  .c-view:hover .v-arrow, .case.is-hover .c-view .v-arrow { transform: translate(5px, -5px); }
+  .case.is-hover .c-view { color: var(--accent); border-color: var(--accent); }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed; top: 0; left: 0; z-index: 90; pointer-events: none;
+    width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%;
+    background: var(--accent); display: none; opacity: 0;
+    will-change: transform; mix-blend-mode: normal;
+  }
+  .cursor .cur-label {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #fff;
+    opacity: 0; white-space: nowrap;
+  }
 
   /* ---------- SKILLS MARQUEE ---------- */
   .skills { padding-bottom: 40px; }
@@ -369,11 +445,17 @@
     .hero-top .loc { text-align: left; }
     .service { grid-template-columns: 1fr; gap: 18px; }
     .service .s-num { font-size: 34px; }
-    .work { grid-template-columns: 28px 1fr auto; gap: 12px; row-gap: 6px; }
-    .work .w-cat { grid-column: 2; }
-    .work .w-year { grid-column: 3; grid-row: 1; }
-    .work .w-arrow { display: none; }
-    .work:hover { padding-left: 0; }
+    /* Works: single column, keep the editorial offsets subtle */
+    .works-list { gap: 74px; }
+    .case, .case.alt { grid-template-columns: 1fr; gap: 18px; }
+    .case .c-media, .case.alt .c-media,
+    .case .c-side, .case.alt .c-side,
+    .case .c-head, .case.alt .c-head,
+    .case .c-view, .case.alt .c-view { grid-column: 1 / -1; grid-row: auto; align-self: auto; }
+    .case .c-num { font-size: 54px; top: -28px; left: 0; right: auto; }
+    .case.alt .c-num { left: 0; right: auto; }
+    .c-frame { aspect-ratio: 4 / 3; }
+    .c-frame.stage-warm .c-img img { max-width: 62%; }
     .about-grid { grid-template-columns: 1fr; }
     .about-photo { max-width: 340px; }
     .foot-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
@@ -381,7 +463,7 @@
   }
   @media (max-width: 520px) {
     .foot-grid { grid-template-columns: 1fr; }
-    .work .w-name { font-size: 32px; }
+    .c-title { font-size: 40px; }
   }
 
   /* ---------- REDUCED MOTION: everything instant, nothing hidden ---------- */
@@ -390,7 +472,11 @@
     .reveal, [data-hero], [data-hero-title], [data-hero-visual] { opacity: 1 !important; transform: none !important; }
     .hero h1 .w-in { transform: none !important; }
     .marquee-track { animation: none !important; transform: none !important; }
-    .work-thumb { display: none !important; }
+    .cursor { display: none !important; }
+    .c-frame { clip-path: none !important; }
+    .c-frame .c-inner, .c-frame .c-img { transform: none !important; }
+    .c-title { transform: none !important; }
+    .c-meta, .c-note, .c-cat { opacity: 1 !important; }
     .badge .pulse::after { display: none; }
   }
 </style>
@@ -527,37 +613,96 @@
       <h2>Selected <span>Works</span></h2>
     </div>
     <div class="works-list" id="worksList">
-      <a class="work reveal" href="https://github.com/GitNinja36/Yummi" target="_blank" rel="noopener" aria-label="Yummi project (opens in new tab)"
-         data-work data-title="Yummi" data-tag="Food-tech wellness"
-         data-grad="linear-gradient(135deg,#ffb24d 0%,#ff6f3c 50%,#e5402a 100%)">
-        <span class="w-idx">01</span>
-        <span class="w-name">Yummi<small>React Native · Go · PostgreSQL · Docker · AWS EC2</small></span>
-        <span class="w-cat">Food-tech wellness app</span>
-        <span class="w-year">2025</span>
-        <span class="w-arrow">
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M6 18L18 6M18 6H8M18 6V16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </span>
-      </a>
-      <a class="work reveal" href="https://deblo.vercel.app" target="_blank" rel="noopener" aria-label="Deblo project (opens in new tab)"
-         data-work data-title="Deblo" data-tag="AI healthcare assistant"
-         data-grad="linear-gradient(135deg,#8fe3ff 0%,#4aa8e0 50%,#2f6fc7 100%)">
-        <span class="w-idx">02</span>
-        <span class="w-name">Deblo<small>Next.js · PostgreSQL · Gemini 2.5 · Drizzle ORM</small></span>
-        <span class="w-cat">AI healthcare assistant</span>
-        <span class="w-year">2025</span>
-        <span class="w-arrow">
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M6 18L18 6M18 6H8M18 6V16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </span>
-      </a>
+
+      <!-- 01 — YUMMI ----------------------------------------------------- -->
+      <article class="case" data-case>
+        <a class="c-media" data-case-media
+           href="https://github.com/GitNinja36/Yummi" target="_blank" rel="noopener"
+           aria-label="Yummi — view repository on GitHub (opens in new tab)">
+          <span class="c-num" data-case-num><i>0</i>1</span>
+          <div class="c-frame stage-warm" data-case-frame>
+            <div class="c-inner" data-case-inner>
+              <div class="c-img" data-case-img>
+                <img src="assets/yummi-chef.webp" alt="Yummi in-app illustration: a 3D chef preparing a meal"
+                     width="622" height="680" loading="lazy" decoding="async" />
+              </div>
+            </div>
+            <span class="stage-note">
+              <span>React Native · Expo</span>
+              <span>In-app artwork</span>
+            </span>
+            <span class="c-tint" data-case-tint></span>
+          </div>
+        </a>
+
+        <div class="c-side">
+          <div class="c-meta" data-case-meta>
+            <span class="m-row"><span class="m-k">Year</span><span class="m-v"><b>2025</b></span></span>
+            <span class="m-row"><span class="m-k">Client</span><span class="m-v">Personal project</span></span>
+            <span class="m-row"><span class="m-k">Stack</span><span class="m-v">React Native, Expo Router, NativeWind, Go, AWS, Clerk</span></span>
+            <span class="m-row"><span class="m-k">Source</span><span class="m-v">Open repository</span></span>
+          </div>
+        </div>
+
+        <div class="c-head">
+          <span class="c-title-clip"><span class="c-title" data-case-title>Yummi</span></span>
+          <span class="c-cat" data-case-cat>Meal tracking &amp; nutrition</span>
+        </div>
+
+        <a class="c-view" data-case-view href="https://github.com/GitNinja36/Yummi" target="_blank" rel="noopener">
+          View project
+          <span class="v-arrow" aria-hidden="true">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5.5M12 4V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+        </a>
+      </article>
+
+      <!-- 02 — DEBLO ----------------------------------------------------- -->
+      <article class="case alt" data-case>
+        <a class="c-media" data-case-media
+           href="https://deblo.vercel.app/" target="_blank" rel="noopener"
+           aria-label="Deblo — open the live application (opens in new tab)">
+          <span class="c-num" data-case-num><i>0</i>2</span>
+          <div class="c-frame" data-case-frame>
+            <div class="c-inner" data-case-inner>
+              <div class="c-img" data-case-img>
+                <img src="assets/deblo-hero.jpg" alt="Deblo landing page: AI clinic front desk with a live consultation panel"
+                     width="1600" height="1000" loading="lazy" decoding="async" />
+              </div>
+            </div>
+            <span class="c-tint" data-case-tint></span>
+          </div>
+        </a>
+
+        <div class="c-side">
+          <div class="c-meta" data-case-meta>
+            <span class="m-row"><span class="m-k">Year</span><span class="m-v"><b>2025</b></span></span>
+            <span class="m-row"><span class="m-k">Type</span><span class="m-v">Live deployment</span></span>
+            <span class="m-row"><span class="m-k">Stack</span><span class="m-v">Next.js, React, Drizzle ORM, Neon Postgres, Gemini, Vapi, Clerk</span></span>
+            <span class="m-row"><span class="m-k">Scope</span><span class="m-v">Symptom intake, triage &amp; booking, voice consultations</span></span>
+          </div>
+          <p class="c-note" data-case-note>Demonstration project — not intended for real medical use.</p>
+        </div>
+
+        <div class="c-head">
+          <span class="c-title-clip"><span class="c-title" data-case-title>Deblo</span></span>
+          <span class="c-cat" data-case-cat>AI clinic front desk</span>
+        </div>
+
+        <a class="c-view" data-case-view href="https://deblo.vercel.app/" target="_blank" rel="noopener">
+          View project
+          <span class="v-arrow" aria-hidden="true">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M4 12L12 4M12 4H5.5M12 4V10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+        </a>
+      </article>
+
     </div>
   </div>
 </section>
 
-<!-- Floating project thumbnail (cursor-follow) -->
-<div class="work-thumb" id="workThumb" aria-hidden="true">
-  <div class="wt-bg"></div>
-  <div class="wt-cap"><b></b><small></small></div>
-</div>
+<!-- Custom cursor (desktop pointer only) -->
+<div class="cursor" id="cursor" aria-hidden="true"><span class="cur-label" id="cursorLabel">View</span></div>
 
 <!-- ============ SKILLS ============ -->
 <section class="skills" id="skills">
@@ -875,46 +1020,127 @@
   }
 
   /* ============================================================
-     PROJECT THUMBNAIL — follows cursor with lag, soft scale-in
+     CUSTOM CURSOR — small dot that expands to a "View" disc
      ============================================================ */
+  var cursor = document.getElementById("cursor");
+  var cursorX = null, cursorY = null;
   if (canHover) {
-    var thumb = document.getElementById("workThumb");
-    var thumbBg = thumb.querySelector(".wt-bg");
-    var thumbTitle = thumb.querySelector(".wt-cap b");
-    var thumbTag = thumb.querySelector(".wt-cap small");
-    var worksList = document.getElementById("worksList");
+    cursor.style.display = "block";
+    gsap.set(cursor, { xPercent: 0, yPercent: 0 });
+    cursorX = gsap.quickTo(cursor, "x", { duration: 0.32, ease: "power3.out" });
+    cursorY = gsap.quickTo(cursor, "y", { duration: 0.32, ease: "power3.out" });
 
-    gsap.set(thumb, { xPercent: -50, yPercent: -50, scale: 0.9 });
-    var tx = gsap.quickTo(thumb, "x", { duration: 0.55, ease: "power3.out" });
-    var ty = gsap.quickTo(thumb, "y", { duration: 0.55, ease: "power3.out" });
-    var thumbShown = false;
+    var cursorReady = false;
+    window.addEventListener("mousemove", function (e) {
+      if (!cursorReady) {
+        // place it without a trail the first time we see the pointer
+        gsap.set(cursor, { x: e.clientX, y: e.clientY });
+        gsap.to(cursor, { opacity: 1, duration: 0.3, ease: "power2.out" });
+        cursorReady = true;
+        return;
+      }
+      cursorX(e.clientX);
+      cursorY(e.clientY);
+    }, { passive: true });
 
-    worksList.addEventListener("mousemove", function (e) {
-      tx(e.clientX);
-      ty(e.clientY);
-    });
-
-    document.querySelectorAll("[data-work]").forEach(function (row) {
-      row.addEventListener("mouseenter", function (e) {
-        thumbBg.style.background = row.getAttribute("data-grad");
-        thumbTitle.textContent = row.getAttribute("data-title");
-        thumbTag.textContent = row.getAttribute("data-tag");
-        thumb.style.display = "block";
-        // jump to cursor without a trail on first appearance
-        gsap.set(thumb, { x: e.clientX, y: e.clientY });
-        thumbShown = true;
-        gsap.to(thumb, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out", overwrite: true });
-      });
-      row.addEventListener("mouseleave", function () {
-        gsap.to(thumb, {
-          opacity: 0, scale: 0.9, duration: 0.4, ease: "power2.out", overwrite: true,
-          onComplete: function () { if (!thumbShown) thumb.style.display = "none"; }
-        });
-        thumbShown = false;
-        setTimeout(function () { if (!thumbShown) thumb.style.display = "none"; }, 420);
-      });
+    document.addEventListener("mouseleave", function () {
+      gsap.to(cursor, { opacity: 0, duration: 0.25 });
+      cursorReady = false;
     });
   }
+
+  function cursorToView(on) {
+    if (!canHover) return;
+    var label = document.getElementById("cursorLabel");
+    gsap.to(cursor, {
+      width: on ? 84 : 12, height: on ? 84 : 12,
+      margin: on ? "-42px 0 0 -42px" : "-6px 0 0 -6px",
+      duration: 0.42, ease: "power3.out", overwrite: "auto"
+    });
+    gsap.to(label, { opacity: on ? 1 : 0, duration: on ? 0.3 : 0.15, ease: "power2.out", overwrite: "auto" });
+  }
+
+  /* ============================================================
+     PROJECT CASE STUDIES
+     - masked scroll reveal (per project, independently)
+     - slow internal image parallax
+     - restrained hover: scale 1 -> 1.035 + subtle mouse-follow
+     ============================================================ */
+  document.querySelectorAll("[data-case]").forEach(function (caseEl) {
+    var media  = caseEl.querySelector("[data-case-media]");
+    var frame  = caseEl.querySelector("[data-case-frame]");
+    var inner  = caseEl.querySelector("[data-case-inner]");
+    var img    = caseEl.querySelector("[data-case-img]");
+    var tint   = caseEl.querySelector("[data-case-tint]");
+    var num    = caseEl.querySelector("[data-case-num]");
+    var titleEl= caseEl.querySelector("[data-case-title]");
+    var cat    = caseEl.querySelector("[data-case-cat]");
+    var meta   = caseEl.querySelector("[data-case-meta]");
+    var note   = caseEl.querySelector("[data-case-note]");
+    var view   = caseEl.querySelector("[data-case-view]");
+
+    var metaBits = [cat, meta, note, view].filter(Boolean);
+
+    /* ---- initial (pre-reveal) state ---- */
+    gsap.set(frame, { clipPath: "inset(100% 0% 0% 0%)" });
+    gsap.set(img, { scale: 1.08 });
+    gsap.set(titleEl, { yPercent: 110 });
+    gsap.set(metaBits, { opacity: 0 });
+    gsap.set(num, { opacity: 0, y: 18 });
+
+    /* ---- reveal: each project animates on its own trigger ---- */
+    var tl = gsap.timeline({
+      scrollTrigger: { trigger: caseEl, start: "top 85%", once: true }
+    });
+    tl.to(frame, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.15, ease: "expo.out" }, 0)
+      .to(img,   { scale: 1, duration: 1.35, ease: "expo.out" }, 0)
+      .to(num,   { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 0.15)
+      .to(titleEl, { yPercent: 0, duration: 0.95, ease: "power3.out" }, 0.22)
+      .to(metaBits, { opacity: 1, duration: 0.7, ease: "power2.out", stagger: 0.07 }, 0.36);
+
+    /* ---- slow internal parallax while scrolling through ---- */
+    gsap.fromTo(inner,
+      { yPercent: -4 },
+      {
+        yPercent: 4, ease: "none",
+        scrollTrigger: { trigger: frame, start: "top bottom", end: "bottom top", scrub: true }
+      }
+    );
+
+    /* ---- desktop hover ---- */
+    if (!canHover) return;
+
+    var imgX = gsap.quickTo(img, "x", { duration: 0.9, ease: "power3.out" });
+    var imgY = gsap.quickTo(img, "y", { duration: 0.9, ease: "power3.out" });
+
+    media.addEventListener("mouseenter", function () {
+      caseEl.classList.add("is-hover");
+      cursorToView(true);
+      gsap.to(img,  { scale: 1.035, duration: 0.65, ease: "power3.out", overwrite: "auto" });
+      gsap.to(tint, { opacity: 0.06, duration: 0.5, ease: "power2.out", overwrite: "auto" });
+      gsap.to(titleEl, { x: 14, duration: 0.6, ease: "power3.out", overwrite: "auto" });
+      gsap.to([meta, note].filter(Boolean), { opacity: 0.5, duration: 0.45, ease: "power2.out", overwrite: "auto" });
+    });
+
+    media.addEventListener("mousemove", function (e) {
+      // very subtle: image drifts a few px toward the cursor
+      var r = frame.getBoundingClientRect();
+      var rx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
+      var ry = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+      imgX(rx * 14);
+      imgY(ry * 10);
+    });
+
+    media.addEventListener("mouseleave", function () {
+      caseEl.classList.remove("is-hover");
+      cursorToView(false);
+      gsap.to(img,  { scale: 1, duration: 0.75, ease: "power3.out", overwrite: "auto" });
+      imgX(0); imgY(0);
+      gsap.to(tint, { opacity: 0, duration: 0.45, ease: "power2.out", overwrite: "auto" });
+      gsap.to(titleEl, { x: 0, duration: 0.7, ease: "power3.out", overwrite: "auto" });
+      gsap.to([meta, note].filter(Boolean), { opacity: 1, duration: 0.45, ease: "power2.out", overwrite: "auto" });
+    });
+  });
 
   /* ============================================================
      MARQUEE — frame-consistent loop on the GSAP ticker,
