@@ -8,19 +8,38 @@
 
 .grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
-  gap: clamp(28px, 5vw, 80px);
-  align-items: end;
+  // Same 41/59 split the rest of the page uses.
+  grid-template-columns: 41% minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 60px);
+  // Must stretch so the sticky statement has travel. `end` bottom-aligned it
+  // against a very tall skills column, which left a huge void above it and
+  // clipped the last line at the viewport edge.
+  align-items: stretch;
 
   @include tablet-down {
     grid-template-columns: 1fr;
-    gap: 40px;
-    align-items: start;
+    gap: 34px;
+  }
+}
+
+.statementCol {
+  position: relative;
+}
+
+// Anchored while the skills scroll past — the same language as the giant
+// project indices, rather than a block stranded at the bottom of the section.
+.statementSticky {
+  position: sticky;
+  top: 34vh;
+  display: block;
+
+  @include tablet-down {
+    position: static;
   }
 }
 
 .statement {
-  @include display(2.4rem, 7.4vw, 8rem);
+  @include display(2.2rem, 6.6vw, 7rem);
   text-transform: uppercase;
   margin-left: -0.012em;
 }
@@ -35,13 +54,15 @@
   margin-bottom: clamp(20px, 3vh, 34px);
 }
 
+// Two columns: five groups across three columns left a ragged 3 + 2 with a
+// hole in it. 2 × (3 + 2) reads as an even editorial block.
 .columns {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(18px, 2.4vw, 34px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(18px, 2.6vw, 40px) clamp(18px, 2.4vw, 34px);
 
   @include mobile {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 }
 

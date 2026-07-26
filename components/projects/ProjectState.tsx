@@ -106,7 +106,17 @@ export default function ProjectState({ project }: { project: Project }) {
           {/* mask: choreography lives here */}
           <div className={`${styles.mask} ${project.fit === "contain" ? styles.stage : ""}`}>
             {/* image: parallax + hover live here */}
-            <div className={styles.image} data-project-image>
+            {/* Where no product screenshot exists, the plate is labelled and the
+              artwork held small, so it reads as an editorial plate rather than
+              pretending to be a product shot. */}
+          {project.assetNote ? (
+            <span className={styles.plateLabel} aria-hidden="true">
+              <span>{project.title}</span>
+              <span>In-app artwork · no screenshot</span>
+            </span>
+          ) : null}
+
+          <div className={styles.image} data-project-image>
               <Image
                 src={asset(project.image)}
                 alt={project.imageAlt}

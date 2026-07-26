@@ -13,15 +13,19 @@ export default function Identity() {
   return (
     <section className={styles.section} id="skills">
       <div className={styles.grid}>
-        <h2 className={styles.statement}>
-          {identityLines.map((line) => (
-            <span className="lineMask" key={line}>
-              <span className="lineInner" data-split-inner>
-                {line}
-              </span>
-            </span>
-          ))}
-        </h2>
+        <div className={styles.statementCol}>
+          <span className={styles.statementSticky}>
+            <h2 className={styles.statement}>
+              {identityLines.map((line) => (
+                <span className="lineMask" key={line}>
+                  <span className="lineInner" data-split-inner>
+                    {line}
+                  </span>
+                </span>
+              ))}
+            </h2>
+          </span>
+        </div>
 
         <div className={styles.skills}>
           <h3 className={styles.skillsHeading}>Skills</h3>
