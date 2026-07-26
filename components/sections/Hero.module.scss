@@ -1,0 +1,200 @@
+@use "../../styles/tokens" as *;
+
+.hero {
+  @include wrap;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  // Deliberately NOT centred — frame 1 has an enormous gap between the nav and
+  // the name, and the lower block sits under the name rather than being
+  // balanced around the middle.
+  padding-top: clamp(18px, 2vh, 28px);
+  padding-bottom: clamp(16px, 2.4vh, 30px);
+}
+
+// ---- Tiny in-flow nav. Not fixed: in the frames it scrolls away with the hero.
+.nav {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: clamp(11px, 0.95vw, 13px);
+  letter-spacing: -0.01em;
+}
+
+.navLinks {
+  display: flex;
+  gap: clamp(10px, 1.2vw, 18px);
+
+  a {
+    color: var(--fg);
+    transition: opacity 0.25s var(--e-micro);
+
+    &:hover {
+      opacity: 0.55;
+    }
+  }
+}
+
+// ---- The name. Frame 1: one line, spans ~97% of the viewport width.
+.nameWrap {
+  // The void between nav and name is the point, but frame 1 puts the cap of
+  // the name at roughly 18% of viewport height, not half way down.
+  margin-top: clamp(18px, 4.4vh, 74px);
+}
+
+.name {
+  font-family: var(--grotesk);
+  font-weight: 500;
+  // Tuned so "ROHIT SHARMA" (12 glyphs) spans ~97% of the viewport, matching
+  // how "ZUNED AALIM" (11 glyphs) filled the reference frame.
+  font-size: clamp(2.6rem, 13.9vw, 15rem);
+  line-height: 0.78;
+  letter-spacing: -0.065em;
+  white-space: nowrap;
+  color: #14140f;
+  // Optical alignment: the cap of the first glyph should sit flush left.
+  margin-left: -0.015em;
+}
+
+// ---- Lower block: arrow + copy + CTA on the left, portrait centred,
+//      availability bottom-right. One row, aligned to the bottom.
+.lower {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: clamp(16px, 2vw, 34px);
+  align-items: start;
+  margin-top: clamp(18px, 2.6vh, 34px);
+
+  @include tablet-down {
+    grid-template-columns: 1fr;
+    gap: 26px;
+  }
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.arrow {
+  color: var(--muted);
+  margin-bottom: clamp(26px, 5vh, 58px);
+}
+
+.copy {
+  @include body-copy;
+  color: #14140f;
+  max-width: 26ch;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: clamp(18px, 3.4vh, 42px);
+  background: #33302a;
+  color: var(--light);
+  border-radius: 100px;
+  padding: 12px 20px;
+  font-family: var(--grotesk);
+  font-weight: 600;
+  font-size: clamp(11px, 0.9vw, 12.5px);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  will-change: transform;
+  transition: background-color 0.35s var(--e-micro);
+
+  &:hover {
+    background: #14140f;
+  }
+
+  svg {
+    transition: transform 0.4s var(--e-swap);
+  }
+  &:hover svg {
+    transform: translate(2px, -2px);
+  }
+}
+
+// ---- Centre portrait, ~4:5 vertical.
+.portrait {
+  position: relative;
+  width: clamp(150px, 21vw, 260px);
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #d9d8d1;
+  justify-self: center;
+
+  @include tablet-down {
+    justify-self: start;
+  }
+}
+
+.portraitInner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  padding: 14px;
+}
+
+// Neutral placeholder — clearly marked, shown only while no asset is set.
+.portraitNote {
+  @include micro;
+  color: #7e7c74;
+  line-height: 1.5;
+}
+
+// Fills the existing 4:5 container without changing its dimensions.
+//
+// The photo is 3:4 (960x1280), so `cover` fills the width and crops ~6.7% of
+// the height. Anchored to the bottom so that trim comes off the top (planting
+// wall) and the subject stays whole down to the feet.
+//
+// Desaturated to match the reference's hero image treatment, which is black
+// and white — and it keeps the hero inside this site's monochrome palette.
+.portraitImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
+  filter: grayscale(1) contrast(1.02);
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  height: 100%;
+  text-align: right;
+
+  @include tablet-down {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+.availLabel {
+  @include micro;
+  color: var(--muted-dark);
+  margin-bottom: 4px;
+}
+
+// Oversized date, as in frame 1's bottom-right composition.
+.availDate {
+  font-family: var(--grotesk);
+  font-weight: 600;
+  font-size: clamp(30px, 4.9vw, 62px);
+  line-height: 0.82;
+  letter-spacing: -0.05em;
+  color: #33302a;
+}
