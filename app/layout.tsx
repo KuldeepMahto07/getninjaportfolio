@@ -1,43 +1,34 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Instrument_Serif } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import SmoothScroll from "@/components/motion/SmoothScroll";
 import CustomCursor from "@/components/motion/CustomCursor";
 import MotionFlag from "@/components/motion/MotionFlag";
 import { profile } from "@/data/content";
 import "@/styles/globals.scss";
 
-const inter = Inter({
+// Neo-grotesk for everything structural. No serif anywhere.
+const grotesk = Inter({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  variable: "--font-inter",
+  weight: ["400", "500", "600"],
+  variable: "--font-grotesk",
   display: "swap",
 });
 
-const serif = Instrument_Serif({
+// Mono carries the giant project indices, micro labels and captions — in the
+// frames the giant "01" has a dotted zero, which is what marks it as mono.
+const mono = JetBrains_Mono({
   subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-  variable: "--font-serif",
+  weight: ["400", "500", "700"],
+  variable: "--font-mono",
   display: "swap",
 });
 
-const title = `${profile.firstName} ${profile.lastName} — ${profile.role}`;
+const title = `${profile.name} — ${profile.role}`;
 
 export const metadata: Metadata = {
   title,
-  description: `${profile.tagline} ${profile.intro}`,
-  authors: [{ name: `${profile.firstName} ${profile.lastName}` }],
-  keywords: [
-    "Rohit Sharma",
-    "Generative AI Developer",
-    "AWS",
-    "NLP",
-    "Machine Learning",
-    "MLOps",
-    "LangChain",
-    "Bedrock Agents",
-    "Bangalore",
-  ],
+  description: profile.tagline,
+  authors: [{ name: profile.name }],
   openGraph: {
     type: "website",
     title,
@@ -49,15 +40,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f4f2ec",
+  themeColor: "#f0f0eb",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${serif.variable}`}>
+    <html lang="en" className={`${grotesk.variable} ${mono.variable}`}>
       <body>
-        {/* Flags <html> for animation *before* paint so pre-animation
-            hidden states never flash for no-JS / reduced-motion users. */}
         <MotionFlag />
         <SmoothScroll>
           {children}

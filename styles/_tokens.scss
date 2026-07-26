@@ -1,20 +1,13 @@
-// Design tokens + the motion vocabulary extracted from the reference site.
-// See MOTION-INVENTORY.md for provenance of each easing/duration value.
-
-// ---- Palette: brutalist editorial, cream + near-black ----
-$cream: #f4f2ec;
-$cream-deep: #ece8de;
-$ink: #14120e;
-$ink-soft: #1c1a15;
-$accent: #3a31e0;
-
 // NOTE: this file must emit **no CSS**. It is `@use`d by every CSS Module, and
 // CSS Modules reject non-pure selectors like `:root`. The custom properties are
 // declared once in globals.scss instead.
 
-// Breakpoints
+// Breakpoints.
+// NOTE: the reference frames are 1024px wide and represent the *desktop*
+// composition, so the tablet breakpoint must sit below 1024 — otherwise the
+// reference viewport itself collapses to the stacked tablet layout.
 $bp-mobile: 640px;
-$bp-tablet: 1024px;
+$bp-tablet: 960px;
 
 @mixin mobile {
   @media (max-width: #{$bp-mobile}) {
@@ -43,26 +36,33 @@ $bp-tablet: 1024px;
   }
 }
 
+// Page gutter — frames show a very tight inline padding (~1.8vw).
 @mixin wrap {
   width: 100%;
-  max-width: var(--maxw);
-  margin-inline: auto;
   padding-inline: var(--pad);
 }
 
-// Oversized editorial display type
-@mixin display($min: 40px, $vw: 9vw, $max: 150px) {
-  font-family: var(--serif);
-  font-weight: 400;
+// Oversized editorial grotesk. Frames: weight 500–600, very tight tracking.
+@mixin display($min, $vw, $max, $weight: 600) {
+  font-family: var(--grotesk);
+  font-weight: $weight;
   font-size: clamp($min, $vw, $max);
-  line-height: 0.92;
-  letter-spacing: -0.02em;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
 }
 
-@mixin eyebrow {
-  font-family: var(--sans);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.18em;
+// Micro label, e.g. (SERVICES) / (PROJECTS) / AVAILABLE FOR WORK
+@mixin micro {
+  font-family: var(--mono);
+  font-size: clamp(9px, 0.72vw, 11px);
+  font-weight: 400;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+@mixin body-copy {
+  font-family: var(--grotesk);
+  font-size: clamp(13px, 1.05vw, 15px);
+  line-height: 1.45;
+  letter-spacing: -0.005em;
 }

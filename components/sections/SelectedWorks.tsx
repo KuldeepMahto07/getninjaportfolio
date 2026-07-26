@@ -1,38 +1,43 @@
 "use client";
 
-import SectionHead from "@/components/layout/SectionHead";
-import TextReveal from "@/components/motion/TextReveal";
-import ProjectRow from "@/components/projects/ProjectRow";
-import { projects } from "@/data/content";
+import ScrambledText from "@/components/motion/ScrambledText";
+import ProjectState from "@/components/projects/ProjectState";
+import { projects, worksIntro } from "@/data/content";
 import styles from "./SelectedWorks.module.scss";
 
 /**
- * Selected Works (ANIMATION_REFERENCE §4, §5).
+ * Selected Works — frames 7 → 10.
  *
- * The heading reveals first, then the intro copy, then each project runs its
- * own state: giant index anchored left, dominant visual right. Yummi and Deblo
- * never enter together — each row owns its triggers and its own sticky range.
+ * Still the same dark canvas as the services: the heading appears toward the
+ * lower-left after the service stack scrolls away, with `(PROJECTS)` and the
+ * intro copy to the centre-right, then each project runs as its own state.
+ *
+ * Not cards, not a grid, not a carousel.
  */
 export default function SelectedWorks() {
   return (
-    <section className={styles.section} id="work">
-      <div className={styles.inner}>
-        <SectionHead label="(Projects)" title="Selected Works /" mode="words" />
+    <section className={styles.section} id="works">
+      <h2 className={styles.heading}>
+        <span className="lineMask">
+          <span className="lineInner" data-split-inner>
+            {worksIntro.heading}
+          </span>
+        </span>
+      </h2>
 
-        <TextReveal
-          text="Two builds that show the range — a cross-platform product with a Go backend, and an AI assistant running live in production."
-          mode="words"
-          as="p"
-          className={styles.intro}
-          stagger={0.012}
-          duration={0.6}
-        />
+      <div className={styles.introRow}>
+        <span className={styles.label}>
+          <ScrambledText text={worksIntro.label} />
+        </span>
+        <p className={styles.intro} data-fade>
+          {worksIntro.intro}
+        </p>
+      </div>
 
-        <div className={styles.list}>
-          {projects.map((project) => (
-            <ProjectRow key={project.title} project={project} />
-          ))}
-        </div>
+      <div className={styles.states}>
+        {projects.map((project) => (
+          <ProjectState key={project.index} project={project} />
+        ))}
       </div>
     </section>
   );

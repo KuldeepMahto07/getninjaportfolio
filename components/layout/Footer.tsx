@@ -1,15 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Reveal from "@/components/motion/Reveal";
-import MagneticButton from "@/components/motion/MagneticButton";
-import { navLinks, profile } from "@/data/content";
+import ScrambledText from "@/components/motion/ScrambledText";
+import { useLenis } from "@/hooks/useLenis";
+import { menuLinks, profile } from "@/data/content";
 import styles from "./Footer.module.scss";
 
-/** Live clock in the subject's timezone — a small "this is a real person" signal. */
+/** Live clock in Rohit's timezone. */
 function useLocalTime(timeZone: string) {
   const [time, setTime] = useState("--:--:--");
-
   useEffect(() => {
     const fmt = new Intl.DateTimeFormat("en-GB", {
       hour: "2-digit",
@@ -23,79 +22,70 @@ function useLocalTime(timeZone: string) {
     const id = window.setInterval(tick, 1000);
     return () => window.clearInterval(id);
   }, [timeZone]);
-
   return time;
 }
 
 const socials = [
-  { label: "LinkedIn", href: profile.linkedin },
-  { label: "GitHub", href: profile.github },
-  { label: "Email", href: `mailto:${profile.email}` },
+  { label: "LinkedIn", href: profile.linkedin, external: true },
+  { label: "GitHub", href: profile.github, external: true },
+  { label: "Email", href: `mailto:${profile.email}`, external: false },
 ];
 
 export default function Footer() {
   const time = useLocalTime("Asia/Kolkata");
-  const [year, setYear] = useState<number | null>(null);
+  const lenis = useLenis();
 
-  // Set on the client so the static export isn't frozen to build-time year.
-  useEffect(() => setYear(new Date().getFullYear()), []);
+  const toTop = () => {
+    if (lenis) lenis.scrollTo(0, { duration: 1.4 });
+    else window.scrollTo({ top: 0 });
+  };
 
   return (
     <footer className={styles.footer}>
-      <div className={styles.inner}>
-        <Reveal className={styles.grid} stagger={0.08} y={30}>
-          <div className={styles.brand}>
-            <span className={styles.logo}>
-              <span className={styles.dot} aria-hidden="true" />
-              {profile.firstName}&nbsp;{profile.lastName}
-            </span>
-            <p>{profile.tagline}</p>
-          </div>
-
-          <nav className={styles.col} aria-label="Footer">
-            <h3>Menu</h3>
-            {navLinks.map((l) => (
-              <a key={l.href} href={l.href} className={styles.link} data-cursor="link">
-                {l.label}
-              </a>
-            ))}
-          </nav>
-
-          <div className={styles.col}>
-            <h3>Socials</h3>
-            {socials.map((s) => (
-              <MagneticButton
-                key={s.label}
-                as="a"
-                href={s.href}
-                className={styles.link}
-                strength={6}
-                data-cursor="link"
-                {...(s.href.startsWith("http") ? { target: "_blank", rel: "noopener" } : {})}
-              >
-                {s.label}
-              </MagneticButton>
-            ))}
-          </div>
-
-          <div className={styles.col}>
-            <h3>Get in touch</h3>
-            <a href={`mailto:${profile.email}`} className={styles.link} data-cursor="link">
-              {profile.email}
+      <div className={styles.grid}>
+        <nav className={styles.col} aria-label="Footer menu">
+          <h2 className={styles.colLabel}>Menu</h2>
+          {menuLinks.map((l) => (
+            <a key={l.href} href={l.href} className={styles.link} data-cursor="link">
+              <ScrambledText text={l.label} />
             </a>
-            <span className={styles.muted}>{profile.availability}</span>
-          </div>
-        </Reveal>
+          ))}
+        </nav>
 
-        <div className={styles.bottom}>
-          <span>
-            © {year ?? ""} {profile.firstName} {profile.lastName}. All rights reserved.
-          </span>
-          <span className={styles.clock}>
-            <span className={styles.pulse} aria-hidden="true" />
-            {profile.location} — <b>{time} IST</b>
-          </span>
+        <div className={styles.col}>
+          <h2 className={styles.colLabel}>Socials</h2>
+          {socials.map((s) => (
+            <a
+              key={s.label}
+              href={s.href}
+              className={styles.link}
+              data-cursor="link"
+              {...(s.external ? { target: "_blank", rel: "noopener" } : {})}
+            >
+              <ScrambledText text={s.label} />
+            </a>
+          ))}
         </div>
+      </div>
+
+      <div className={styles.bottom}>
+        <div className={styles.timeBlock}>
+          <span className={styles.timeLabel}>Local time</span>
+          <span className={styles.time}>{time} IST</span>
+          <span className={styles.place}>{profile.location}</span>
+        </div>
+
+        <button className={styles.top} onClick={toTop} aria-label="Back to top" data-cursor="button">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M12 19V5M12 5L6 11M12 5L18 11"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
       </div>
     </footer>
   );

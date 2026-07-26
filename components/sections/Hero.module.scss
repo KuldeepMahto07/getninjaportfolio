@@ -1,111 +1,184 @@
 @use "../../styles/tokens" as *;
 
 .hero {
-  position: relative;
-  padding-top: clamp(130px, 20vh, 210px);
-  padding-bottom: clamp(50px, 9vh, 110px);
-}
-
-.inner {
   @include wrap;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  // Deliberately NOT centred — frame 1 has an enormous gap between the nav and
+  // the name, and the lower block sits under the name rather than being
+  // balanced around the middle.
+  padding-top: clamp(18px, 2vh, 28px);
+  padding-bottom: clamp(16px, 2.4vh, 30px);
 }
 
-.meta {
+// ---- Tiny in-flow nav. Not fixed: in the frames it scrolls away with the hero.
+.nav {
   display: flex;
-  justify-content: space-between;
   align-items: baseline;
+  justify-content: space-between;
   gap: 20px;
-  font-size: 13px;
-  color: var(--muted);
-  padding-bottom: 26px;
-  border-bottom: 1px solid var(--line);
+  font-size: clamp(11px, 0.95vw, 13px);
+  letter-spacing: -0.01em;
+}
 
-  span:last-child {
-    text-align: right;
-  }
+.navLinks {
+  display: flex;
+  gap: clamp(10px, 1.2vw, 18px);
 
-  @include mobile {
-    flex-direction: column;
-    gap: 6px;
+  a {
+    color: var(--fg);
+    transition: opacity 0.25s var(--e-micro);
 
-    span:last-child {
-      text-align: left;
+    &:hover {
+      opacity: 0.55;
     }
   }
 }
 
-// Oversized name, one masked line per word
-.name {
-  margin-top: clamp(18px, 3vw, 40px);
-  @include display(64px, 15.5vw, 250px);
-  text-transform: uppercase;
-  font-weight: 400;
+// ---- The name. Frame 1: one line, spans ~97% of the viewport width.
+.nameWrap {
+  // The void between nav and name is the point, but frame 1 puts the cap of
+  // the name at roughly 18% of viewport height, not half way down.
+  margin-top: clamp(18px, 4.4vh, 74px);
 }
 
-.nameLine {
-  display: block;
+.name {
+  font-family: var(--grotesk);
+  font-weight: 500;
+  // Tuned so "ROHIT SHARMA" (12 glyphs) spans ~97% of the viewport, matching
+  // how "ZUNED AALIM" (11 glyphs) filled the reference frame.
+  font-size: clamp(2.6rem, 13.9vw, 15rem);
+  line-height: 0.78;
+  letter-spacing: -0.065em;
+  white-space: nowrap;
+  color: #14140f;
+  // Optical alignment: the cap of the first glyph should sit flush left.
+  margin-left: -0.015em;
+}
 
-  &:last-child {
-    // Unusual positioning: second line indented, editorial rather than centred
-    padding-left: clamp(0px, 12vw, 240px);
+// ---- Lower block: arrow + copy + CTA on the left, portrait centred,
+//      availability bottom-right. One row, aligned to the bottom.
+.lower {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: clamp(16px, 2vw, 34px);
+  align-items: start;
+  margin-top: clamp(18px, 2.6vh, 34px);
+
+  @include tablet-down {
+    grid-template-columns: 1fr;
+    gap: 26px;
   }
 }
 
-.roleRow {
-  margin-top: clamp(22px, 3vw, 44px);
-}
-
-.role {
-  @include display(24px, 3.4vw, 46px);
-  max-width: 22ch;
-  line-height: 1.08;
-}
-
-.bottom {
+.left {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 44px;
-  margin-top: clamp(34px, 5vw, 70px);
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
-.desc {
-  max-width: 46ch;
-  font-size: clamp(14px, 1.3vw, 17px);
-  line-height: 1.6;
+.arrow {
   color: var(--muted);
+  margin-bottom: clamp(26px, 5vh, 58px);
 }
 
-.ctaWrap {
-  flex: none;
+.copy {
+  @include body-copy;
+  color: #14140f;
+  max-width: 26ch;
 }
 
 .cta {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  background: var(--ink);
-  color: var(--cream);
-  font-size: 15px;
-  font-weight: 500;
-  padding: 16px 28px;
+  gap: 8px;
+  margin-top: clamp(18px, 3.4vh, 42px);
+  background: #33302a;
+  color: var(--light);
   border-radius: 100px;
+  padding: 12px 20px;
+  font-family: var(--grotesk);
+  font-weight: 600;
+  font-size: clamp(11px, 0.9vw, 12.5px);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
   white-space: nowrap;
   will-change: transform;
-  transition:
-    background-color 0.35s var(--e-micro),
-    color 0.35s var(--e-micro);
+  transition: background-color 0.35s var(--e-micro);
+
+  &:hover {
+    background: #14140f;
+  }
 
   svg {
     transition: transform 0.4s var(--e-swap);
   }
-
-  &:hover {
-    background: var(--accent);
-    color: #fff;
-  }
   &:hover svg {
-    transform: translate(3px, -3px);
+    transform: translate(2px, -2px);
   }
+}
+
+// ---- Centre portrait, ~4:5 vertical.
+.portrait {
+  position: relative;
+  width: clamp(150px, 21vw, 260px);
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #d9d8d1;
+  justify-self: center;
+
+  @include tablet-down {
+    justify-self: start;
+  }
+}
+
+.portraitInner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  padding: 14px;
+}
+
+// Neutral placeholder — clearly marked, no portrait asset was supplied.
+.portraitNote {
+  @include micro;
+  color: #7e7c74;
+  line-height: 1.5;
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  height: 100%;
+  text-align: right;
+
+  @include tablet-down {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+.availLabel {
+  @include micro;
+  color: var(--muted-dark);
+  margin-bottom: 4px;
+}
+
+// Oversized date, as in frame 1's bottom-right composition.
+.availDate {
+  font-family: var(--grotesk);
+  font-weight: 600;
+  font-size: clamp(30px, 4.9vw, 62px);
+  line-height: 0.82;
+  letter-spacing: -0.05em;
+  color: #33302a;
 }

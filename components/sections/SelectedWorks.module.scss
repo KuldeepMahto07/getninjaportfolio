@@ -1,26 +1,52 @@
 @use "../../styles/tokens" as *;
 
 .section {
-  padding-bottom: clamp(40px, 7vw, 90px);
-}
-
-.inner {
   @include wrap;
+  padding-top: clamp(50px, 14vh, 170px);
+  padding-bottom: clamp(40px, 8vh, 100px);
 }
 
-.intro {
-  // Pushed right, mirroring the reference's asymmetric intro placement.
-  margin: clamp(30px, 4vw, 56px) 0 clamp(70px, 10vw, 140px) auto;
-  width: min(52ch, 100%);
-  font-size: clamp(15px, 1.5vw, 20px);
-  line-height: 1.55;
-  color: var(--muted);
+.heading {
+  @include display(2.6rem, 8.6vw, 9rem);
+  text-transform: uppercase;
+  margin-left: -0.012em;
+}
 
-  @include desktop {
-    margin-left: 40%;
+// Same offset geometry as the services intro: label ~43%, copy ~52%.
+.introRow {
+  display: grid;
+  grid-template-columns: 41% 10% minmax(0, 26ch);
+  align-items: start;
+  margin-top: clamp(30px, 6vh, 74px);
+
+  @include tablet-down {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: clamp(24px, 4vh, 44px);
   }
 }
 
-.list {
-  display: block;
+.label {
+  grid-column: 2;
+  @include micro;
+  color: var(--fg-muted);
+  white-space: nowrap;
+
+  @include tablet-down {
+    grid-column: 1;
+  }
+}
+
+.intro {
+  grid-column: 3;
+  @include body-copy;
+  color: var(--fg-muted);
+
+  @include tablet-down {
+    grid-column: 1;
+  }
+}
+
+.states {
+  margin-top: clamp(30px, 6vh, 70px);
 }

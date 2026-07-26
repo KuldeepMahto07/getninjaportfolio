@@ -38,7 +38,9 @@ export default function SectionTransition({
   useGsapContext(
     ({ scope }) => {
       if (!scope || disabled) return;
-      if (window.matchMedia("(max-width: 1024px)").matches) return;
+      // Kept above the mobile breakpoint only. Must stay below 1024 so the
+      // 1024-wide reference viewport still gets the handoff.
+      if (window.matchMedia("(max-width: 640px)").matches) return;
 
       const trigger = document.querySelector(triggerSelector);
       if (!trigger) return;

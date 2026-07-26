@@ -3,38 +3,31 @@
 // Design tokens as custom properties. Declared here only — `_tokens.scss` is
 // shared with CSS Modules and must not emit any CSS.
 :root {
-  --cream: #f4f2ec;
-  --cream-deep: #ece8de;
-  --ink: #14120e;
-  --ink-soft: #1c1a15;
-  --accent: #3a31e0;
+  // Palette taken from the frames: warm off-white and a near-black that is
+  // very slightly green, not pure #000.
+  --light: #f0f0eb;
+  --dark: #080a07;
+  --text-light: #e8e8e2;
+  --muted: #a8a7a1;
+  --muted-dark: #6f6e69;
 
-  --bg: var(--cream);
-  --fg: var(--ink);
-  --muted: #6f6d64;
-  --muted-2: #a29e93;
-  --line: rgba(20, 18, 14, 0.14);
-  --line-strong: rgba(20, 18, 14, 0.3);
+  --bg: var(--light);
+  --fg: #14140f;
+  --fg-muted: #6f6e69;
+  --line: rgba(20, 20, 15, 0.16);
 
-  // Inverted (dark) sections
-  --bg-invert: var(--ink);
-  --fg-invert: var(--cream);
-  --line-invert: rgba(244, 242, 236, 0.16);
-  --muted-invert: #8f8b80;
+  --grotesk: var(--font-grotesk), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono: var(--font-mono), "SFMono-Regular", Menlo, monospace;
 
-  --serif: var(--font-serif), Georgia, "Times New Roman", serif;
-  --sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+  // Frames show a very tight page gutter.
+  --pad: clamp(16px, 1.8vw, 26px);
 
-  --maxw: 1440px;
-  --pad: clamp(20px, 5vw, 80px);
+  --radius-sheet: 28px;
 
-  // ---- Motion vocabulary [extracted from the reference site] ----
-  --e-micro: cubic-bezier(0.4, 0, 0.2, 1); // 6x in reference CSS
-  --e-swap: cubic-bezier(0.77, 0, 0.175, 1); // large moves / text swap
-  --e-overshoot: cubic-bezier(0.51, 0.92, 0.24, 1.15);
-  --e-reveal: cubic-bezier(0.65, 0, 0.35, 1); // revealFromTop keyframe
-  --d-micro: 0.15s;
-  --d-swap: 0.5s;
+  // Motion vocabulary [extracted from the reference bundle]
+  --e-micro: cubic-bezier(0.4, 0, 0.2, 1);
+  --e-swap: cubic-bezier(0.77, 0, 0.175, 1);
+  --e-reveal: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 *,
@@ -47,16 +40,15 @@
 
 // ============================================================
 // SECTION SHEETS
-// Major sections behave like physical sheets: a new sheet rises from below
-// and covers the previous one, which stays pinned behind it. Pure CSS —
-// `position: sticky` on the outgoing sheet plus ascending z-index on the
-// incoming one. No ScrollTrigger needed, so it is perfectly reversible and
-// cannot desync from Lenis.
+// A new sheet rises from below and covers the previous one, which stays pinned
+// behind it. Pure CSS: `position: sticky` on the outgoing sheet plus ascending
+// z-index on the incoming one. Nothing here is ScrollTrigger-driven, so the
+// overlap is exactly reversible and cannot desync from Lenis.
 //
-// IMPORTANT: sheets must never set `overflow: hidden`/`clip`. Doing so would
-// re-root any `position: sticky` descendant (the Selected Works index) to the
-// sheet instead of the viewport, silently killing it. `border-radius` alone
-// clips the sheet background, which is all the rounded corners need.
+// Sheets must never set `overflow: hidden`/`clip` — that would re-root any
+// `position: sticky` descendant (service rows, project indices) to the sheet
+// instead of the viewport and silently kill them. `border-radius` alone clips
+// the sheet background, which is all the rounded corners need.
 // ============================================================
 .sheet {
   position: relative;
@@ -65,54 +57,44 @@
   color: var(--fg);
 }
 
-// The outgoing sheet stays put while the next one slides over it.
 .sheet--pinned {
   position: sticky;
   top: 0;
 }
 
-// Rounded top corners on an incoming sheet, as in the reference.
 .sheet--rise {
-  border-top-left-radius: clamp(18px, 2vw, 30px);
-  border-top-right-radius: clamp(18px, 2vw, 30px);
+  border-top-left-radius: var(--radius-sheet);
+  border-top-right-radius: var(--radius-sheet);
 }
 
-// ---- Tonal contexts -------------------------------------------------
-// Sections read their colours from custom properties, so flipping the tone on
-// a sheet inverts everything inside it without touching section styles.
 .tone-light {
-  --bg: var(--cream);
-  --fg: var(--ink);
-  --muted: #6f6d64;
-  --muted-2: #a29e93;
-  --line: rgba(20, 18, 14, 0.14);
-  --line-strong: rgba(20, 18, 14, 0.3);
+  --bg: var(--light);
+  --fg: #14140f;
+  --fg-muted: #6f6e69;
+  --line: rgba(20, 20, 15, 0.16);
 }
 
 .tone-dark {
-  --bg: var(--ink);
-  --fg: var(--cream);
-  --muted: #8f8b80;
-  --muted-2: #56534b;
-  --line: rgba(244, 242, 236, 0.16);
-  --line-strong: rgba(244, 242, 236, 0.34);
+  --bg: var(--dark);
+  --fg: var(--text-light);
+  --fg-muted: var(--muted);
+  --line: rgba(232, 232, 226, 0.16);
 }
 
 html {
   -webkit-text-size-adjust: 100%;
-  // Lenis owns scrolling; native smooth would fight it.
-  scroll-behavior: auto;
+  scroll-behavior: auto; // Lenis owns scrolling
+  background: var(--dark); // behind the sheets, never seen as a flash
 }
 
 body {
-  background: var(--bg);
-  color: var(--fg);
-  font-family: var(--sans);
+  background: var(--light);
+  color: #14140f;
+  font-family: var(--grotesk);
   font-weight: 400;
-  line-height: 1.5;
+  line-height: 1.45;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
-  transition: background-color 0.6s var(--e-micro), color 0.6s var(--e-micro);
 }
 
 a {
@@ -132,8 +114,8 @@ button {
   cursor: pointer;
 }
 ::selection {
-  background: var(--accent);
-  color: #fff;
+  background: #14140f;
+  color: var(--light);
 }
 
 // ---- Lenis ----
@@ -151,7 +133,6 @@ html.lenis body {
   overflow: hidden;
 }
 
-// Hide the native cursor only when our custom one is active
 html.has-custom-cursor {
   @include fine-pointer {
     &,
@@ -161,8 +142,7 @@ html.has-custom-cursor {
   }
 }
 
-// ---- Reveal primitives ----
-// Masked text: the clip container hides the inner line until it slides up.
+// ---- Masked line reveal primitive ----
 .lineMask {
   display: block;
   overflow: hidden;
@@ -175,19 +155,13 @@ html.has-custom-cursor {
   will-change: transform;
 }
 
-// Pre-animation state, applied only when JS motion is active so that
-// no-JS / reduced-motion users never see hidden content.
-html.motion {
-  .lineInner {
-    transform: translateY(110%);
-  }
-  [data-fade] {
-    opacity: 0;
-  }
-  [data-clip] {
-    clip-path: inset(0 0 100% 0);
-  }
-}
+// Pre-animation hidden states are intentionally NOT applied yet.
+//
+// PASS 5 will reintroduce them together with the GSAP masked reveals, scoped
+// under `html.motion` so no-JS and reduced-motion visitors never see hidden
+// content. Enabling them before the reveals exist just renders a blank page —
+// the markup hooks (.lineMask/.lineInner, [data-fade], [data-clip]) are already
+// in place and inert.
 
 .visually-hidden {
   position: absolute;
@@ -206,13 +180,11 @@ html.motion {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
-  html.motion {
-    .lineInner,
-    [data-fade],
-    [data-clip] {
-      transform: none !important;
-      opacity: 1 !important;
-      clip-path: none !important;
-    }
+  .lineInner,
+  [data-fade],
+  [data-clip] {
+    transform: none !important;
+    opacity: 1 !important;
+    clip-path: none !important;
   }
 }

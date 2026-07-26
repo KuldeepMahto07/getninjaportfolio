@@ -2,78 +2,53 @@
 
 // Colours come from the enclosing sheet's tone context.
 .section {
-  padding: clamp(80px, 14vh, 170px) 0 clamp(70px, 11vw, 150px);
-}
-
-.inner {
   @include wrap;
+  padding-top: clamp(60px, 14vh, 170px);
+  padding-bottom: clamp(70px, 16vh, 200px);
 }
 
-.label {
-  @include eyebrow;
-  color: var(--muted);
-  display: block;
-  margin-bottom: clamp(22px, 3vw, 38px);
-}
-
-.headline {
-  @include display(46px, 11.5vw, 190px);
+.heading {
+  @include display(2.6rem, 10.5vw, 11rem);
   text-transform: uppercase;
+  margin-left: -0.012em;
 }
 
-.headlineLine {
-  display: block;
-
-  // Staggered indents so the three lines read as a composition
-  &:nth-child(2) {
-    padding-left: clamp(0px, 8vw, 150px);
-  }
-  &:nth-child(3) {
-    padding-left: clamp(0px, 16vw, 300px);
-    color: var(--accent);
-  }
-}
-
-.columns {
+.grid {
   display: grid;
-  grid-template-columns: 1fr 1.1fr;
-  gap: clamp(32px, 6vw, 90px);
-  margin-top: clamp(46px, 7vw, 90px);
+  grid-template-columns: 41% minmax(0, 1fr);
+  gap: clamp(26px, 4vw, 60px);
+  margin-top: clamp(46px, 10vh, 120px);
 
   @include tablet-down {
     grid-template-columns: 1fr;
+    gap: 34px;
   }
 }
 
 .aside {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  align-items: flex-start;
+  gap: 10px;
 }
 
-.blurb {
-  font-size: clamp(15px, 1.4vw, 18px);
-  line-height: 1.6;
-  color: var(--muted);
-  max-width: 34ch;
-}
-
-.mail {
-  @include display(18px, 2.2vw, 30px);
+.link {
+  @include body-copy;
+  color: var(--fg);
   position: relative;
-  width: fit-content;
+  padding-bottom: 2px;
 
   &::after {
     content: "";
     position: absolute;
     left: 0;
     right: 0;
-    bottom: -4px;
+    bottom: 0;
     height: 1px;
     background: currentColor;
     transform: scaleX(0);
     transform-origin: left;
-    transition: transform 0.5s var(--e-swap);
+    transition: transform 0.45s var(--e-swap);
   }
 
   &:hover::after {
@@ -81,10 +56,16 @@
   }
 }
 
+.loc {
+  @include micro;
+  color: var(--fg-muted);
+  margin-top: 8px;
+}
+
 .form {
   display: flex;
   flex-direction: column;
-  gap: 26px;
+  gap: 22px;
 }
 
 .field {
@@ -97,99 +78,51 @@
     border: 0;
     border-bottom: 1px solid var(--line);
     color: var(--fg);
-    font-family: inherit;
-    font-size: 16px;
-    padding: 26px 0 12px;
+    font-family: var(--grotesk);
+    font-size: clamp(14px, 1.1vw, 16px);
+    padding: 24px 0 10px;
     resize: vertical;
 
     &:focus {
       outline: none;
+      border-bottom-color: var(--fg);
     }
   }
 
   label {
     position: absolute;
     left: 0;
-    top: 24px;
-    @include eyebrow;
-    font-size: 11px;
-    color: var(--muted);
+    top: 22px;
+    @include micro;
+    color: var(--fg-muted);
     pointer-events: none;
-    transition:
-      transform 0.4s var(--e-micro),
-      color 0.4s var(--e-micro);
+    transition: transform 0.4s var(--e-micro);
   }
 
-  // Float the label on focus or once filled
   input:focus + label,
   input:not(:placeholder-shown) + label,
   textarea:focus + label,
   textarea:not(:placeholder-shown) + label {
-    transform: translateY(-22px);
-    color: var(--accent);
+    transform: translateY(-20px);
   }
-}
-
-// Animated focus underline drawn from the left
-.underline {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 1px;
-  background: var(--accent);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.5s var(--e-swap);
-}
-
-.field:focus-within .underline {
-  transform: scaleX(1);
 }
 
 .submit {
-  display: inline-flex;
-  align-items: center;
+  align-self: flex-start;
+  margin-top: 6px;
   background: var(--fg);
   color: var(--bg);
   border-radius: 100px;
-  padding: 16px 34px;
-  font-size: 15px;
-  font-weight: 500;
-  overflow: hidden;
+  padding: 14px 26px;
+  font-family: var(--grotesk);
+  font-weight: 600;
+  font-size: clamp(11px, 0.9vw, 12.5px);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
   will-change: transform;
-  transition: background-color 0.35s var(--e-micro);
+  transition: opacity 0.35s var(--e-micro);
 
   &:hover {
-    background: var(--accent);
-    color: #fff;
-  }
-}
-
-// Two stacked labels swapping vertically
-.submitSwap {
-  position: relative;
-  display: block;
-  overflow: hidden;
-  line-height: 1.35;
-
-  span {
-    display: block;
-    transition: transform 0.5s var(--e-swap);
-  }
-
-  span:last-child {
-    position: absolute;
-    inset: 0;
-    transform: translateY(105%);
-  }
-}
-
-.submit:hover .submitSwap {
-  span:first-child {
-    transform: translateY(-105%);
-  }
-  span:last-child {
-    transform: translateY(0);
+    opacity: 0.85;
   }
 }
