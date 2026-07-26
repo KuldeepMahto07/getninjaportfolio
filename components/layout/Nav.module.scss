@@ -20,6 +20,20 @@
   border-bottom-color: var(--line);
 }
 
+// Inverted while a dark sheet is under the nav. Overriding the custom
+// properties flips every child (labels, badge border, burger) at once.
+.onDark {
+  --fg: var(--cream);
+  --muted: #8f8b80;
+  --line: rgba(244, 242, 236, 0.16);
+  --line-strong: rgba(244, 242, 236, 0.34);
+  color: var(--cream);
+
+  &.scrolled {
+    background: rgba(20, 18, 14, 0.72);
+  }
+}
+
 .inner {
   @include wrap;
   display: flex;

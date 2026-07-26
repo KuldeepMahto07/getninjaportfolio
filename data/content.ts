@@ -48,6 +48,8 @@ export type Project = {
   num: string;
   title: string;
   category: string;
+  /** Short discipline pill shown beside the year. */
+  tag: string;
   year: string;
   href: string;
   linkLabel: string;
@@ -65,6 +67,7 @@ export const projects: Project[] = [
     num: "01",
     title: "Yummi",
     category: "Meal tracking & nutrition",
+    tag: "Mobile",
     year: "2025",
     href: "https://github.com/GitNinja36/Yummi",
     linkLabel: "View repository",
@@ -84,6 +87,7 @@ export const projects: Project[] = [
     num: "02",
     title: "Deblo",
     category: "AI clinic front desk",
+    tag: "AI / Web",
     year: "2025",
     href: "https://deblo.vercel.app/",
     linkLabel: "View live site",

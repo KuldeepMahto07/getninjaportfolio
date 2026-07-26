@@ -38,10 +38,15 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
     gsap.ticker.lagSmoothing(0);
 
     setLenis(instance);
+    // Exposed for debugging and automated scroll verification. Driving scroll
+    // through Lenis (rather than window.scrollTo) is the only way to move the
+    // page without fighting its animated position.
+    (window as unknown as { __lenis?: Lenis }).__lenis = instance;
 
     return () => {
       gsap.ticker.remove(raf);
       instance.destroy();
+      delete (window as unknown as { __lenis?: Lenis }).__lenis;
       setLenis(null);
     };
   }, [ready, reduced]);

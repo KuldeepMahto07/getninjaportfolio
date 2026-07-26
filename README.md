@@ -42,6 +42,40 @@ Animations live in the primitives and in each section's own `useGsapContext`
 call — never in `page.tsx`. Every context is scoped with `gsap.context()` so
 tweens and ScrollTriggers revert on unmount.
 
+## The two scroll systems
+
+The page runs two distinct scroll compositions, both on one global Lenis
+instance (no nested smooth-scroll containers, no second instance).
+
+**1. Section sheet stacking.** Major sections behave like layered sheets: the
+outgoing sheet is `position: sticky; top: 0` and the incoming one is normal
+flow with a higher `z-index` and rounded top corners, so it slides up and
+covers it. This is deliberately **pure CSS** — no ScrollTrigger — which is why
+it is exactly reversible, freezes wherever you stop scrolling, and can never
+desync from Lenis. The previous section's *contents* recede separately
+(`SectionTransition`), which is what produces the reference's state at ~4s:
+light canvas still visible up top, hero copy already gone.
+
+Tonal rhythm: light hero → dark content → light editorial → dark contact →
+**light footer**, revealed beneath the contact sheet.
+
+> Sheets must never set `overflow: hidden`/`clip`. That would re-root any
+> `position: sticky` descendant to the sheet instead of the viewport and
+> silently kill the Works index. `border-radius` alone clips the background.
+
+**2. Selected Works choreography.** A two-zone composition: an enormous index
+(~290px, ~26vh) anchored on the left ~40%, and the dominant project visual on
+the right ~60% (~73vh tall). The index is `position: sticky` inside its own
+grid cell, and the cell is as tall as the row — so `01` stays anchored for
+~720px of scrolling, then hands off to `02` as the next row arrives. Again
+CSS-driven, so scrolling up reverses it precisely.
+
+Two constraints worth knowing before changing this:
+- The row must be `align-items: stretch`. With `start`, the index column
+  collapses to content height and the number drifts instead of anchoring.
+- Anchor duration is bought with row height, but too much leaves a dead band
+  under each project. 135vh is the balance struck here.
+
 ## Motion primitives
 
 - `SmoothScroll` — Lenis + ScrollTrigger, one shared RAF loop

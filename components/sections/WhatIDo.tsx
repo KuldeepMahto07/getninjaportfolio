@@ -2,8 +2,9 @@
 
 import { useRef } from "react";
 import { gsap, useGsapContext } from "@/hooks/useGsap";
-import SectionHead from "@/components/layout/SectionHead";
 import TextReveal from "@/components/motion/TextReveal";
+import Reveal from "@/components/motion/Reveal";
+import ScrambledText from "@/components/motion/ScrambledText";
 import { services } from "@/data/content";
 import styles from "./WhatIDo.module.scss";
 
@@ -50,16 +51,31 @@ export default function WhatIDo() {
   return (
     <section ref={ref} className={styles.section} id="services">
       <div className={styles.inner}>
-        <SectionHead label="(Services)" title="What I Do" mode="chars" />
-
+        {/* Frame 03 geometry: the heading stands alone at the top of the
+            sheet; the label and description sit far to the right beneath it,
+            with a lot of empty space between them. */}
         <TextReveal
-          text="I design and ship production-grade AI systems — from data pipelines and fine-tuned models to autonomous agents that scale reliably on the cloud."
-          mode="words"
-          as="p"
-          className={styles.intro}
-          stagger={0.012}
-          duration={0.6}
+          text="What I Do /"
+          mode="chars"
+          as="h2"
+          className={styles.heading}
+          stagger={0.018}
+          duration={0.9}
         />
+
+        <div className={styles.introRow}>
+          <Reveal className={styles.labelWrap} y={16} stagger={0} duration={0.6}>
+            <ScrambledText text="(Services)" className={styles.label} />
+          </Reveal>
+          <TextReveal
+            text="I design and ship production-grade AI systems — from data pipelines and retrieval to autonomous agents and cloud deployment."
+            mode="words"
+            as="p"
+            className={styles.intro}
+            stagger={0.012}
+            duration={0.6}
+          />
+        </div>
 
         <div className={styles.list}>
           {services.map((service) => (

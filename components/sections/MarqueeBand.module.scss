@@ -1,9 +1,11 @@
 @use "../../styles/tokens" as *;
 
+// Sits inside the dark sheet, so it inherits its tone; the rules above and
+// below give the band its own weight without changing colour.
 .band {
-  background: var(--bg-invert);
-  color: var(--fg-invert);
   padding: clamp(26px, 4vw, 52px) 0;
   margin: clamp(50px, 8vw, 110px) 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
   overflow: hidden;
 }

@@ -45,6 +45,59 @@
   box-sizing: border-box;
 }
 
+// ============================================================
+// SECTION SHEETS
+// Major sections behave like physical sheets: a new sheet rises from below
+// and covers the previous one, which stays pinned behind it. Pure CSS —
+// `position: sticky` on the outgoing sheet plus ascending z-index on the
+// incoming one. No ScrollTrigger needed, so it is perfectly reversible and
+// cannot desync from Lenis.
+//
+// IMPORTANT: sheets must never set `overflow: hidden`/`clip`. Doing so would
+// re-root any `position: sticky` descendant (the Selected Works index) to the
+// sheet instead of the viewport, silently killing it. `border-radius` alone
+// clips the sheet background, which is all the rounded corners need.
+// ============================================================
+.sheet {
+  position: relative;
+  z-index: var(--sheet-z, 1);
+  background: var(--bg);
+  color: var(--fg);
+}
+
+// The outgoing sheet stays put while the next one slides over it.
+.sheet--pinned {
+  position: sticky;
+  top: 0;
+}
+
+// Rounded top corners on an incoming sheet, as in the reference.
+.sheet--rise {
+  border-top-left-radius: clamp(18px, 2vw, 30px);
+  border-top-right-radius: clamp(18px, 2vw, 30px);
+}
+
+// ---- Tonal contexts -------------------------------------------------
+// Sections read their colours from custom properties, so flipping the tone on
+// a sheet inverts everything inside it without touching section styles.
+.tone-light {
+  --bg: var(--cream);
+  --fg: var(--ink);
+  --muted: #6f6d64;
+  --muted-2: #a29e93;
+  --line: rgba(20, 18, 14, 0.14);
+  --line-strong: rgba(20, 18, 14, 0.3);
+}
+
+.tone-dark {
+  --bg: var(--ink);
+  --fg: var(--cream);
+  --muted: #8f8b80;
+  --muted-2: #56534b;
+  --line: rgba(244, 242, 236, 0.16);
+  --line-strong: rgba(244, 242, 236, 0.34);
+}
+
 html {
   -webkit-text-size-adjust: 100%;
   // Lenis owns scrolling; native smooth would fight it.

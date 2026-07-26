@@ -19,17 +19,44 @@ import styles from "./Nav.module.scss";
 export default function Nav() {
   const ref = useRef<HTMLElement>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [onDark, setOnDark] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState<string>("");
   const lenis = useLenis();
   const { reduced, ready } = useMotionPreference();
 
-  // Compact state after leaving the hero
+  // Compact state after leaving the hero, plus tone detection.
+  //
+  // Sheets alternate between light and dark, so a fixed nav has to invert as
+  // they pass beneath it — otherwise the translucent cream bar reads as a grey
+  // band over the dark sheets. We hit-test just under the nav and read the
+  // tone class off whichever sheet is there.
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    onScroll();
+    let frame = 0;
+
+    const sample = () => {
+      frame = 0;
+      setScrolled(window.scrollY > 40);
+
+      const probeY = 6;
+      const hits = document.elementsFromPoint(window.innerWidth / 2, probeY);
+      const sheet = hits.find((el) => el.classList?.contains("sheet"));
+      setOnDark(Boolean(sheet?.classList.contains("tone-dark")));
+    };
+
+    const onScroll = () => {
+      // Coalesce to one read per frame; elementsFromPoint forces layout.
+      if (!frame) frame = requestAnimationFrame(sample);
+    };
+
+    sample();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
   }, []);
 
   // Scrollspy
@@ -84,7 +111,12 @@ export default function Nav() {
 
   return (
     <>
-      <header ref={ref} className={`${styles.nav} ${scrolled ? styles.scrolled : ""}`}>
+      <header
+        ref={ref}
+        className={[styles.nav, scrolled ? styles.scrolled : "", onDark ? styles.onDark : ""]
+          .filter(Boolean)
+          .join(" ")}
+      >
         <div className={styles.inner}>
           <a
             href="#top"

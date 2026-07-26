@@ -1,7 +1,7 @@
 @use "../../styles/tokens" as *;
 
 .section {
-  padding-bottom: clamp(70px, 11vw, 150px);
+  padding-bottom: clamp(40px, 7vw, 90px);
 }
 
 .inner {
@@ -9,15 +9,18 @@
 }
 
 .intro {
-  margin: clamp(30px, 4vw, 56px) 0 clamp(60px, 8vw, 110px);
+  // Pushed right, mirroring the reference's asymmetric intro placement.
+  margin: clamp(30px, 4vw, 56px) 0 clamp(70px, 10vw, 140px) auto;
+  width: min(52ch, 100%);
   font-size: clamp(15px, 1.5vw, 20px);
   line-height: 1.55;
   color: var(--muted);
-  max-width: 52ch;
+
+  @include desktop {
+    margin-left: 40%;
+  }
 }
 
 .list {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(90px, 14vh, 200px);
+  display: block;
 }

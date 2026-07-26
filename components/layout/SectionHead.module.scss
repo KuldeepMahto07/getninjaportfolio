@@ -4,26 +4,23 @@
   display: flex;
   align-items: baseline;
   gap: 18px;
-  padding-top: clamp(56px, 8vw, 96px);
-  border-top: 1px solid var(--line);
+  padding-top: clamp(56px, 8vw, 100px);
   flex-wrap: wrap;
+}
+
+.labelWrap {
+  flex: none;
 }
 
 .label {
   @include eyebrow;
   color: var(--muted);
-  flex: none;
+  font-variant-numeric: tabular-nums;
 }
 
 .title {
-  @include display(30px, 4.6vw, 76px);
+  // Huge, left-aligned, with the generous negative space of the reference.
+  @include display(38px, 8.5vw, 132px);
   text-transform: uppercase;
-}
-
-.invert {
-  border-top-color: var(--line-invert);
-
-  .label {
-    color: var(--muted-invert);
-  }
+  flex: 1 1 100%;
 }
