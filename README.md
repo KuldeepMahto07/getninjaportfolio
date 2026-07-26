@@ -6,10 +6,7 @@ ScrollTrigger and Lenis.
 
 Motion is not a layer on top of this site — every section defines its own
 initial state, entrance, scroll behaviour, hover/mouse interaction and mobile
-fallback. The timing and easing vocabulary was derived by inspecting the
-reference portfolio's shipped CSS/JS; see **[MOTION-INVENTORY.md](./MOTION-INVENTORY.md)**
-for the documented parameters and where each value came from.
-
+fallback. 
 ## Stack
 
 | Concern | Choice |
