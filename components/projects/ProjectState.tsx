@@ -1,6 +1,9 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useRef } from "react";
+import { gsap, useGsapContext } from "@/hooks/useGsap";
+import { useMotionPreference } from "@/hooks/useMotionPreference";
 import ScrambledText from "@/components/motion/ScrambledText";
 import { asset } from "@/lib/asset";
 import type { Project } from "@/data/content";
@@ -23,8 +26,66 @@ import styles from "./ProjectState.module.scss";
  * never write `transform` to the same node.
  */
 export default function ProjectState({ project }: { project: Project }) {
+  const rootRef = useRef<HTMLElement>(null);
+  const { reduced, finePointer, ready } = useMotionPreference();
+
+  // Scroll parallax lives on the image node only (Pass 6). Scrubbed, ease
+  // "none" — it must track scroll exactly and reverse on the way back.
+  useGsapContext(
+    ({ scope }) => {
+      if (!scope) return;
+      const img = scope.querySelector<HTMLElement>("[data-project-image]");
+      const mask = img?.parentElement;
+      if (!img || !mask) return;
+
+      gsap.fromTo(
+        img,
+        { yPercent: -4 },
+        {
+          yPercent: 4,
+          ease: "none",
+          scrollTrigger: { trigger: mask, start: "top bottom", end: "bottom top", scrub: true },
+        },
+      );
+    },
+    rootRef,
+    [],
+  );
+
+  // Restrained hover: 1 -> 1.025, no tilt, no fake 3D.
+  useEffect(() => {
+    if (!ready || reduced || !finePointer) return;
+    const root = rootRef.current;
+    // Hover scale targets the <img> itself, NOT [data-project-image] — that
+    // wrapper is owned by the scrubbed parallax. Two systems writing transform
+    // to one node silently cancel each other out (ANIMATION_REFERENCE §11).
+    const img = root?.querySelector<HTMLElement>("[data-project-image] img");
+    const link = root?.querySelector<HTMLElement>('[data-cursor="project"]');
+    if (!img || !link) return;
+
+    // A plain tween, not quickTo: quickTo is for high-frequency per-frame
+    // updates (mouse follow), and a one-shot hover state doesn't need it.
+    const to = (scale: number) =>
+      gsap.to(img, { scale, duration: 0.7, ease: "power3.out", overwrite: "auto" });
+    const onEnter = () => to(1.025);
+    const onLeave = () => to(1);
+
+    link.addEventListener("pointerenter", onEnter);
+    link.addEventListener("pointerleave", onLeave);
+    // Marker so automated checks can assert the handlers really attached
+    // (a silently-skipped effect looks identical to a broken animation).
+    link.dataset.hoverReady = "1";
+
+    return () => {
+      link.removeEventListener("pointerenter", onEnter);
+      link.removeEventListener("pointerleave", onLeave);
+      delete link.dataset.hoverReady;
+      gsap.killTweensOf(img);
+    };
+  }, [ready, reduced, finePointer]);
+
   return (
-    <article className={styles.state}>
+    <article ref={rootRef} className={styles.state}>
       <div className={styles.indexCol}>
         <span className={styles.indexSticky}>
           <span className={styles.index} data-index aria-hidden="true">

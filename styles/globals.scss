@@ -155,13 +155,24 @@ html.has-custom-cursor {
   will-change: transform;
 }
 
-// Pre-animation hidden states are intentionally NOT applied yet.
+// Pre-animation hidden states, driven by RevealEngine (Pass 5).
 //
-// PASS 5 will reintroduce them together with the GSAP masked reveals, scoped
-// under `html.motion` so no-JS and reduced-motion visitors never see hidden
-// content. Enabling them before the reveals exist just renders a blank page —
-// the markup hooks (.lineMask/.lineInner, [data-fade], [data-clip]) are already
-// in place and inert.
+// Scoped under `html.motion`, which MotionFlag adds before first paint and only
+// when the user has not asked for reduced motion. So:
+//   JS disabled     -> class never added -> content visible
+//   reduced motion  -> class never added -> content visible
+//   normal          -> hidden pre-paint, then revealed (no flash)
+html.motion {
+  .lineInner {
+    transform: translateY(110%);
+  }
+  [data-fade] {
+    opacity: 0;
+  }
+  [data-clip] {
+    clip-path: inset(0 0 100% 0);
+  }
+}
 
 .visually-hidden {
   position: absolute;

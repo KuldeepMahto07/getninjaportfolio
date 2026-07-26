@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import SmoothScroll from "@/components/motion/SmoothScroll";
 import CustomCursor from "@/components/motion/CustomCursor";
 import MotionFlag from "@/components/motion/MotionFlag";
+import RevealEngine from "@/components/motion/RevealEngine";
 import { profile } from "@/data/content";
 import "@/styles/globals.scss";
 
@@ -50,6 +51,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <MotionFlag />
         <SmoothScroll>
           {children}
+          {/* Mounted after the page so every reveal hook exists in the DOM. */}
+          <RevealEngine />
           <CustomCursor />
         </SmoothScroll>
       </body>

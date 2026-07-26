@@ -79,9 +79,10 @@
   background: #171815;
 }
 
+// Overscanned so the parallax travel never exposes an edge inside the mask.
 .image {
   position: absolute;
-  inset: 0;
+  inset: -5% 0;
   will-change: transform;
 }
 
@@ -91,6 +92,8 @@
   object-fit: cover;
   // Anchor left so a screenshot's headline/nav stays readable when cropped.
   object-position: left center;
+  // Hover scale is applied here; parallax lives on the parent.
+  will-change: transform;
 }
 
 // Yummi ships no product screenshot, only in-app artwork. Rather than invent a
