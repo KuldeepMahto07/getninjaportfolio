@@ -105,13 +105,33 @@ npm run build      # static export to ./out
 
 ## Deployment
 
-Pushes to `main` build and publish to GitHub Pages via
-`.github/workflows/deploy-pages.yml`. Enable it once under
-**Settings → Pages → Source: GitHub Actions**.
+The app is a fully static export (`output: "export"` in `next.config.ts`), so it
+can be hosted either way.
 
-The workflow passes `BASE_PATH` so the export works from the project sub-path.
-Note that `images.unoptimized` means asset URLs are emitted verbatim, so public
-assets go through `lib/asset.ts` to pick up that prefix.
+### GitHub Pages
+
+Pushes to `main` build and publish via `.github/workflows/deploy-pages.yml`.
+Enable it once under **Settings → Pages → Source: GitHub Actions**.
+
+Project Pages are served from `/<repo>`, so the workflow passes `BASE_PATH` and
+the app applies it as `basePath`. Because `images.unoptimized` makes next/image
+emit `src` verbatim, public assets go through `lib/asset.ts` to pick up that
+prefix.
+
+### Vercel
+
+`vercel.json` pins the build explicitly:
+
+```json
+{ "buildCommand": "next build", "outputDirectory": "out" }
+```
+
+`outputDirectory` matters — with `output: "export"` the build lands in `out/`,
+not `.next/`, and a mismatch there is served as `404: NOT_FOUND`.
+
+**Do not set `BASE_PATH` on Vercel.** It exists only for the Pages sub-path;
+setting it would prefix every asset with `/getninjaportfolio` and break the
+site at the domain root.
 
 ## Content accuracy
 
